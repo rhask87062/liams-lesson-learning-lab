@@ -41,28 +41,65 @@ export function useTherapistAuth() {
   };
 
   // Create therapist account (parent-controlled)
-  const createTherapistAccount = (accountData) => {
+  const createParentAccount = (accountData) => {
+    const { name, email, password } = accountData;
+
+    // Check if an account (any account) already exists
+    if (localStorage.getItem('userAccounts')) {
+        throw new Error('An account already exists. Setup can only be run once.');
+    }
+
+    const parentData = {
+      id: `parent_${Date.now()}`,
+      name,
+      email,
+      role: 'parent', // <-- The crucial difference
+      createdAt: new Date().toISOString(),
+    };
+
+    const passwordHash = CryptoJS.SHA256(password).toString();
+    
+    const users = {
+        [email]: {
+            ...parentData,
+            passwordHash: passwordHash
+        }
+    };
+
+    // Store all users in a single, encrypted object
+    const encryptedUsers = CryptoJS.AES.encrypt(
+      JSON.stringify(users), 
+      'app-users-secret-key'
+    ).toString();
+
+    localStorage.setItem('userAccounts', encryptedUsers);
+    
+    console.log("Parent account created successfully!", parentData);
+    return parentData;
+  };
+
+  // Create therapist account (parent-controlled)
+  const createTherapistAccount = (accountData, authenticatedParent) => {
+    // Ensure the person creating this account is a logged-in parent
+    if (!authenticatedParent || authenticatedParent.role !== 'parent') {
+        throw new Error('Only a parent can create new accounts.');
+    }
+    
     const { 
       name, 
       email, 
       credentials, 
       institution, 
-      password,
-      parentPassword 
+      password
     } = accountData;
 
-    // Verify parent password first
-    const storedParentHash = localStorage.getItem('parentPasswordHash');
-    if (!storedParentHash) {
-      // First time setup - create parent password
-      const parentHash = CryptoJS.SHA256(parentPassword).toString();
-      localStorage.setItem('parentPasswordHash', parentHash);
-    } else {
-      // Verify existing parent password
-      const parentHash = CryptoJS.SHA256(parentPassword).toString();
-      if (parentHash !== storedParentHash) {
-        throw new Error('Invalid parent password');
-      }
+    // Decrypt existing users
+    const encryptedUsers = localStorage.getItem('userAccounts');
+    const decryptedUsers = CryptoJS.AES.decrypt(encryptedUsers, 'app-users-secret-key').toString(CryptoJS.enc.Utf8);
+    const users = JSON.parse(decryptedUsers);
+
+    if (users[email]) {
+        throw new Error(`An account with the email ${email} already exists.`);
     }
 
     // Create secure therapist account
@@ -70,6 +107,7 @@ export function useTherapistAuth() {
       id: `therapist_${Date.now()}`,
       name,
       email,
+      role: 'therapist',
       credentials,
       institution,
       createdAt: new Date().toISOString(),
@@ -85,59 +123,66 @@ export function useTherapistAuth() {
 
     // Hash and store therapist password
     const passwordHash = CryptoJS.SHA256(password).toString();
-    const encryptedData = CryptoJS.AES.encrypt(
-      JSON.stringify(therapistData), 
-      'therapist-data-key'
+    
+    users[email] = {
+        ...therapistData,
+        passwordHash: passwordHash
+    };
+
+    const updatedEncryptedData = CryptoJS.AES.encrypt(
+      JSON.stringify(users), 
+      'app-users-secret-key'
     ).toString();
 
-    localStorage.setItem('therapistAccount', encryptedData);
-    localStorage.setItem('therapistPasswordHash', passwordHash);
-    localStorage.setItem('therapistEmail', email);
+    localStorage.setItem('userAccounts', updatedEncryptedData);
 
     return therapistData;
   };
 
-  // Therapist login
+  // Login for any user
   const login = async (email, password) => {
     try {
-      const storedEmail = localStorage.getItem('therapistEmail');
-      const storedPasswordHash = localStorage.getItem('therapistPasswordHash');
-      const encryptedAccount = localStorage.getItem('therapistAccount');
-
-      if (!storedEmail || !storedPasswordHash || !encryptedAccount) {
-        throw new Error('No therapist account found. Please contact the parent to set up access.');
+      const encryptedUsers = localStorage.getItem('userAccounts');
+      if (!encryptedUsers) {
+        throw new Error('No accounts have been set up for this application.');
       }
+      
+      const decryptedUsers = CryptoJS.AES.decrypt(encryptedUsers, 'app-users-secret-key').toString(CryptoJS.enc.Utf8);
+      const users = JSON.parse(decryptedUsers);
 
-      if (email !== storedEmail) {
+      const userData = users[email];
+
+      if (!userData) {
         throw new Error('Invalid email address');
       }
 
       const passwordHash = CryptoJS.SHA256(password).toString();
-      if (passwordHash !== storedPasswordHash) {
+      if (passwordHash !== userData.passwordHash) {
         throw new Error('Invalid password');
       }
 
       // Decrypt therapist data
-      const decryptedData = CryptoJS.AES.decrypt(encryptedAccount, 'therapist-data-key').toString(CryptoJS.enc.Utf8);
-      const therapistData = JSON.parse(decryptedData);
+      const userToLogin = { ...userData };
+      delete userToLogin.passwordHash; // Don't keep hash in session
+
 
       // Update last login
-      therapistData.lastLogin = new Date().toISOString();
+      userToLogin.lastLogin = new Date().toISOString();
+      users[email].lastLogin = userToLogin.lastLogin; // Update the record
       const updatedEncryptedData = CryptoJS.AES.encrypt(
-        JSON.stringify(therapistData), 
-        'therapist-data-key'
+        JSON.stringify(users), 
+        'app-users-secret-key'
       ).toString();
-      localStorage.setItem('therapistAccount', updatedEncryptedData);
+      localStorage.setItem('userAccounts', updatedEncryptedData);
 
       // Create session (expires in 8 hours)
       const sessionExpiry = new Date().getTime() + (8 * 60 * 60 * 1000);
       const sessionData = {
-        id: therapistData.id,
-        name: therapistData.name,
-        email: therapistData.email,
-        credentials: therapistData.credentials,
-        institution: therapistData.institution,
-        permissions: therapistData.permissions,
+        id: userToLogin.id,
+        name: userToLogin.name,
+        email: userToLogin.email,
+        role: userToLogin.role,
+        permissions: userToLogin.permissions,
         loginTime: new Date().toISOString()
       };
 
@@ -185,6 +230,7 @@ export function useTherapistAuth() {
       therapistId: therapistData.id,
       therapistName: therapistData.name,
       therapistEmail: therapistData.email,
+      role: therapistData.role, // Log the role
       sessionId: `session_${Date.now()}`
     };
 
@@ -200,42 +246,20 @@ export function useTherapistAuth() {
 
   // Change therapist password (requires parent password)
   const changePassword = (currentPassword, newPassword, parentPassword) => {
-    // Verify parent password
-    const storedParentHash = localStorage.getItem('parentPasswordHash');
-    const parentHash = CryptoJS.SHA256(parentPassword).toString();
-    if (parentHash !== storedParentHash) {
-      throw new Error('Invalid parent password');
-    }
-
-    // Verify current therapist password
-    const storedPasswordHash = localStorage.getItem('therapistPasswordHash');
-    const currentPasswordHash = CryptoJS.SHA256(currentPassword).toString();
-    if (currentPasswordHash !== storedPasswordHash) {
-      throw new Error('Invalid current password');
-    }
-
-    // Update password
-    const newPasswordHash = CryptoJS.SHA256(newPassword).toString();
-    localStorage.setItem('therapistPasswordHash', newPasswordHash);
-
-    logAccess('password_change', therapistInfo);
-    return true;
+    // This function needs to be re-evaluated in the new user model.
+    // For now, it is disabled to prevent unintended side-effects.
+    throw new Error("Password change functionality is temporarily disabled pending administrative updates.");
   };
 
   // Get access log (parent only)
   const getAccessLog = (parentPassword) => {
-    const storedParentHash = localStorage.getItem('parentPasswordHash');
-    const parentHash = CryptoJS.SHA256(parentPassword).toString();
-    if (parentHash !== storedParentHash) {
-      throw new Error('Invalid parent password');
-    }
-
-    return JSON.parse(localStorage.getItem('therapistAccessLog') || '[]');
+     // This function needs to be re-evaluated in the new user model.
+    throw new Error("Log access functionality is temporarily disabled pending administrative updates.");
   };
 
   // Check if therapist account exists
   const hasTherapistAccount = () => {
-    return !!localStorage.getItem('therapistAccount');
+    return !!localStorage.getItem('userAccounts');
   };
 
   // Get session time remaining

@@ -32,8 +32,16 @@ function App() {
   const [isNavigationLocked, setIsNavigationLocked] = useState(false);
   const [showUnlockPrompt, setShowUnlockPrompt] = useState(false);
   const [showPWAInstallPrompt, setShowPWAInstallPrompt] = useState(false);
-  const { isAuthenticated, login, logout } = useTherapistAuth();
+  const { isAuthenticated, login, logout, createParentAccount } = useTherapistAuth();
   const [wordList, setWordList] = useState(transformInitialWords(initialWords));
+
+  // Expose the account creation function to the window for one-time setup
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      window.createParentAccount = createParentAccount;
+      console.log('Parent account creation function is available. Type `createParentAccount({ ... })` in the console.');
+    }
+  }, [createParentAccount]);
 
   useEffect(() => {
     // This helps initialize ResponsiveVoice and deals with browser restrictions on audio.
@@ -173,7 +181,7 @@ function App() {
         return (
           <RootMenu
             onSelectActivity={handleActivitySelect}
-            onProgressDashboard={handleProgressDashboard}
+            onProgressDashboard={handleTherapistDashboard}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}
           />
@@ -239,9 +247,14 @@ function App() {
       case 'therapist':
         return (
           <TherapistDashboard
-            onHome={handleHome}
-            onLock={handleLock}
-            isNavigationLocked={isNavigationLocked}
+            progressData={{
+                // This is placeholder data. In a real app, you'd fetch this
+                // from a secure source after authentication.
+                sessions: [],
+                wordStats: {},
+                dailyStats: {}
+            }}
+            onAddNote={(note) => console.log('Note added:', note)}
           />
         );
       case 'word-list-manager':

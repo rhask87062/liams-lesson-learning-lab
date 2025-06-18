@@ -9,8 +9,59 @@ import {
   CheckCircle, AlertCircle, Activity, Brain
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import { useTherapistAuth } from '@/hooks/useTherapistAuth.js';
+import Login from '@/components/Login.jsx';
 
-const TherapistDashboard = ({ 
+const TherapistDashboard = ({ progressData, onAddNote }) => {
+    const { 
+        isAuthenticated, 
+        therapistInfo, 
+        login, 
+        logout, 
+        extendSession, 
+        getSessionTimeRemaining
+    } = useTherapistAuth();
+    
+    const [loginError, setLoginError] = useState(null);
+    const [sessionTimeRemaining, setSessionTimeRemaining] = useState(getSessionTimeRemaining());
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            const timer = setInterval(() => {
+                setSessionTimeRemaining(getSessionTimeRemaining());
+            }, 1000); // Update every second
+            return () => clearInterval(timer);
+        }
+    }, [isAuthenticated, getSessionTimeRemaining]);
+
+    const handleLogin = async (email, password) => {
+        try {
+            setLoginError(null);
+            await login(email, password);
+        } catch (error) {
+            setLoginError(error.message);
+        }
+    };
+    
+    if (!isAuthenticated || !therapistInfo) {
+        return <Login onLogin={handleLogin} error={loginError} />;
+    }
+
+    // The rest of the component remains the same, but uses the hook's functions
+    return (
+        <DashboardContent
+            progressData={progressData}
+            onLogout={logout}
+            therapistInfo={therapistInfo}
+            onAddNote={onAddNote}
+            onExtendSession={extendSession}
+            sessionTimeRemaining={sessionTimeRemaining}
+        />
+    );
+};
+
+// We move the original dashboard presentation logic into its own component
+const DashboardContent = ({ 
   progressData, 
   onLogout, 
   therapistInfo, 
