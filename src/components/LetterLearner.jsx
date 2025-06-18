@@ -66,15 +66,15 @@ const WordPopup = ({ wordData }) => {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.5 } }}
-      className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
+      className="fixed inset-0 flex items-center justify-center z-20 pointer-events-none overflow-hidden"
     >
       <div
-        className="flex flex-col items-center"
+        className="flex flex-col items-center max-w-[90vw] max-h-[90vh]"
         style={{ filter: 'drop-shadow(3px 5px 4px rgba(0,0,0,0.7))' }}
       >
-        <div className="text-9xl md:text-[12rem]">
+        <div className="text-9xl md:text-[12rem] flex items-center justify-center">
           {isImage ? (
-            <img src={wordData.image} alt={wordData.word} className="h-64 w-auto object-contain" />
+            <img src={wordData.image} alt={wordData.word} className="h-64 w-auto object-contain max-w-full" />
           ) : (
             <span>{wordData.image}</span>
           )}
