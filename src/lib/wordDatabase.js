@@ -179,21 +179,24 @@ export const speakLetter = (letter) => {
   TTS.speak(letter, { rate: 0.7, pitch: 1.2 });
 };
 
-export const speakSequence = (items) => {
+export const speakSequence = (items, delay = 800) => {
   TTS.cancel(); // Stop any previous speech
 
-  const speakItem = (index) => {
-    if (index >= items.length) return;
+  // Add a small delay to ensure ResponsiveVoice is ready
+  setTimeout(() => {
+    const speakItem = (index) => {
+      if (index >= items.length) return;
 
-    const currentItem = items[index];
-    const parameters = {
-      onend: () => speakItem(index + 1)
+      const currentItem = items[index];
+      const parameters = {
+        onend: () => setTimeout(() => speakItem(index + 1), delay)
+      };
+      
+      TTS.speak(currentItem, parameters);
     };
-    
-    TTS.speak(currentItem, parameters);
-  };
 
-  speakItem(0);
+    speakItem(0);
+  }, 100);
 };
 
 export const stopSpeaking = () => {

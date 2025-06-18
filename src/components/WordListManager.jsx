@@ -1,56 +1,108 @@
-import React, { useState, useRef } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { generateImage } from '../services/OpenAI_API';
-import { Upload, Wand2, Home } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Trash2, Plus, Download, Home, Loader2 } from 'lucide-react';
+import { generateImage } from '../services/OpenAI_API.js';
 
 const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
-  const [newWordText, setNewWordText] = useState('');
-  const [newWordImage, setNewWordImage] = useState(null); // Will store URL or file object
-  const [isGenerating, setIsGenerating] = useState(false);
-  const fileInputRef = useRef(null);
+  const [newWord, setNewWord] = useState('');
+  const [generatingImage, setGeneratingImage] = useState(null);
+
+  // Helper function to download image and convert to base64
+  const downloadAndConvertToBase64 = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      throw error;
+    }
+  };
 
   const handleAddWord = () => {
-    if (!newWordText.trim() || !newWordImage) {
-      alert('Please enter a word and upload or generate an image.');
-      return;
+    if (newWord.trim()) {
+      const newWordObj = {
+        word: newWord.trim().toUpperCase(),
+        image: '❓' // Default emoji
+      };
+      onWordListUpdate([...wordList, newWordObj]);
+      setNewWord('');
     }
-    const newWord = {
-      word: newWordText.trim(),
-      image: typeof newWordImage === 'string' ? newWordImage : URL.createObjectURL(newWordImage),
-    };
-    onWordListUpdate([...wordList, newWord]);
-    setNewWordText('');
-    setNewWordImage(null);
   };
 
-  const handleDelete = (wordToDelete) => {
-    if (window.confirm(`Are you sure you want to delete '${wordToDelete}'?`)) {
-      onWordListUpdate(wordList.filter(wordObj => wordObj.word !== wordToDelete));
-    }
+  const handleDeleteWord = (index) => {
+    const updatedList = wordList.filter((_, i) => i !== index);
+    onWordListUpdate(updatedList);
   };
-  
-  const handleGenerateClick = async () => {
-    if (!newWordText.trim()) {
-      alert("Please enter a word before generating an image.");
-      return;
-    }
-    setIsGenerating(true);
+
+  const handleGenerateImage = async (index) => {
+    setGeneratingImage(index);
     try {
-      const imageUrl = await generateImage(newWordText.trim());
-      setNewWordImage(imageUrl); // DALL-E returns a URL
+      const word = wordList[index].word;
+      const imageUrl = await generateImage(word);
+      
+      // Download and convert to base64
+      const base64Image = await downloadAndConvertToBase64(imageUrl);
+      
+      // Update the word list with the base64 image
+      const updatedList = [...wordList];
+      updatedList[index] = { ...updatedList[index], image: base64Image };
+      onWordListUpdate(updatedList);
     } catch (error) {
-      alert("Failed to generate image. Make sure your API key is set correctly in a .env file.");
+      console.error('Error generating or saving image:', error);
+      alert('Failed to generate image. Please check your OpenAI API key and billing.');
     } finally {
-      setIsGenerating(false);
+      setGeneratingImage(null);
     }
   };
-  
-  const handleFileUpload = (event) => {
+
+  const handleImageChange = (index, newImage) => {
+    const updatedList = [...wordList];
+    updatedList[index] = { ...updatedList[index], image: newImage };
+    onWordListUpdate(updatedList);
+  };
+
+  const exportWordList = () => {
+    const dataStr = JSON.stringify(wordList, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = 'wordlist.json';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
+
+  const importWordList = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setNewWordImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedList = JSON.parse(e.target.result);
+          onWordListUpdate(importedList);
+        } catch (error) {
+          alert('Invalid file format');
+        }
+      };
+      reader.readAsText(file);
     }
+  };
+
+  const isImageBase64 = (image) => {
+    return typeof image === 'string' && image.startsWith('data:image/');
+  };
+
+  const isImagePath = (image) => {
+    return typeof image === 'string' && (image.includes('/') || image.includes('.png') || image.includes('.jpg'));
   };
 
   return (
@@ -61,63 +113,105 @@ const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Add New Word</h2>
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-grow">
-              <label htmlFor="newWord" className="block text-sm font-medium text-gray-700 mb-1">Word</label>
-              <Input
-                id="newWord"
-                type="text"
-                value={newWordText}
-                onChange={(e) => setNewWordText(e.target.value)}
-                placeholder="E.g., Dinosaur"
-                className="mt-1 block w-full"
-              />
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="flex gap-2 mb-4">
+            <Input
+              type="text"
+              value={newWord}
+              onChange={(e) => setNewWord(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddWord()}
+              placeholder="Add new word..."
+              className="flex-1"
+            />
+            <Button onClick={handleAddWord} className="bg-blue-500 hover:bg-blue-600">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="flex gap-2 mb-4">
+            <Button onClick={exportWordList} className="flex-1">
+              Export Word List
+            </Button>
+            <label className="flex-1">
+              <Button className="w-full" asChild>
+                <span>Import Word List</span>
+              </Button>
               <input
                 type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
+                accept=".json"
+                onChange={importWordList}
                 className="hidden"
-                accept="image/*"
               />
-              <Button onClick={() => fileInputRef.current.click()} variant="outline">
-                <Upload className="mr-2 h-4 w-4" /> Upload Image
-              </Button>
-              <Button onClick={handleGenerateClick} disabled={isGenerating}>
-                <Wand2 className="mr-2 h-4 w-4" /> 
-                {isGenerating ? 'Generating...' : 'Generate Image'}
-              </Button>
-            </div>
+            </label>
           </div>
-          {newWordImage && (
-            <div className="mt-4">
-              <p className="text-sm font-medium text-gray-700">Image Preview:</p>
-              <img 
-                src={typeof newWordImage === 'string' ? newWordImage : URL.createObjectURL(newWordImage)} 
-                alt="Preview" 
-                className="mt-2 h-24 w-24 object-cover rounded-md border"
-              />
-            </div>
-          )}
-          <Button onClick={handleAddWord} className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white">
-            Add Word to List
-          </Button>
         </div>
 
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Current Words</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {wordList.map((wordObj, index) => (
-              <div key={index} className="bg-white border p-4 rounded-lg shadow-sm flex flex-col items-center justify-center text-center">
-                <img src={wordObj.image} alt={wordObj.word} className="w-24 h-24 object-contain mb-4 rounded-md" />
-                <p className="text-xl font-semibold mb-4">{wordObj.word}</p>
-                <Button onClick={() => handleDelete(wordObj.word)} variant="destructive" size="sm">
-                  Delete
-                </Button>
-              </div>
-            ))}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="max-h-96 overflow-y-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 sticky top-0">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Word
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {wordList.map((wordObj, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {wordObj.word}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex items-center gap-2">
+                        {isImageBase64(wordObj.image) ? (
+                          <img src={wordObj.image} alt={wordObj.word} className="h-10 w-10 object-contain" />
+                        ) : isImagePath(wordObj.image) ? (
+                          <img src={wordObj.image} alt={wordObj.word} className="h-10 w-10 object-contain" />
+                        ) : (
+                          <span className="text-2xl">{wordObj.image}</span>
+                        )}
+                        <Input
+                          type="text"
+                          value={isImageBase64(wordObj.image) ? '[Generated Image]' : wordObj.image}
+                          onChange={(e) => !isImageBase64(wordObj.image) && handleImageChange(index, e.target.value)}
+                          className="w-24"
+                          disabled={isImageBase64(wordObj.image)}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleGenerateImage(index)}
+                          disabled={generatingImage === index}
+                          size="sm"
+                          className="bg-purple-500 hover:bg-purple-600"
+                        >
+                          {generatingImage === index ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Download className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteWord(index)}
+                          size="sm"
+                          variant="destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

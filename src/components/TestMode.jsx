@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import { Volume2, Lock, LockOpen, Home, Check, X } from 'lucide-react';
 import { speakWord } from '../lib/wordDatabase';
+import WordImage from '@/components/ui/WordImage.jsx';
 
 const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked }) => {
   const [userInput, setUserInput] = useState('');
@@ -96,13 +98,13 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
       <div className="text-center space-y-6 md:space-y-8 max-w-4xl w-full relative z-10">
         {/* Word display */}
         <div className={`bg-white rounded-3xl p-8 md:p-12 shadow-lg ${showFeedback ? (isCorrect ? 'feedback-correct' : 'feedback-incorrect') : ''}`}>
-          <div className="text-6xl md:text-8xl mb-6 tablet-emoji">{currentWord.image}</div>
+          <WordImage image={currentWord.image} word={currentWord.word} />
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">
             Spell this word from the picture:
           </h2>
           
           {/* Input field */}
-          <input
+          <Input
             type="text"
             value={userInput}
             onChange={handleInputChange}

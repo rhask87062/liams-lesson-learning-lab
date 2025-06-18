@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { speakWord } from '../lib/wordDatabase';
+import WordImage from '@/components/ui/WordImage.jsx';
 
 const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked }) => {
   const [userInput, setUserInput] = useState('');
@@ -129,7 +130,9 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
       <div className="text-center space-y-6 md:space-y-8 max-w-4xl w-full relative z-10">
         {/* Word display */}
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg">
-          <div className="text-6xl md:text-8xl mb-6 tablet-emoji">{currentWord.image}</div>
+          <div className="text-6xl md:text-8xl mb-6 tablet-emoji">
+            <WordImage image={currentWord.image} word={currentWord.word} />
+          </div>
           <h2 className="text-6xl md:text-8xl font-bold text-purple-600 mb-6">
             {currentWord.word.toUpperCase()}
           </h2>

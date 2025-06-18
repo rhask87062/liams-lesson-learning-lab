@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
 import { speakWord } from '../lib/wordDatabase';
+import WordImage from '@/components/ui/WordImage.jsx';
 
 const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLocked }) => {
   if (!currentWord) return null;
@@ -74,7 +76,7 @@ const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLo
       <div className="text-center space-y-6 md:space-y-8 max-w-4xl w-full relative z-10">
         {/* Word display */}
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg">
-          <div className="text-6xl md:text-8xl mb-6 tablet-emoji">{currentWord.image}</div>
+          <WordImage image={currentWord.image} word={currentWord.word} />
           <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
             {currentWord.word.toUpperCase()}
           </h1>

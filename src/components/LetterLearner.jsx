@@ -56,8 +56,10 @@ const EruptionPuff = () => (
 const WordPopup = ({ wordData }) => {
   if (!wordData) return null;
 
-  // A more robust check to differentiate between a file path and an emoji character.
-  const isImagePath = typeof wordData.image === 'string' && wordData.image.includes('/');
+  // Check if it's a base64 image, a file path, or an emoji
+  const isBase64Image = typeof wordData.image === 'string' && wordData.image.startsWith('data:image/');
+  const isImagePath = typeof wordData.image === 'string' && (wordData.image.includes('/') || wordData.image.includes('.png') || wordData.image.includes('.jpg'));
+  const isImage = isBase64Image || isImagePath;
 
   return (
     <motion.div
@@ -71,7 +73,7 @@ const WordPopup = ({ wordData }) => {
         style={{ filter: 'drop-shadow(3px 5px 4px rgba(0,0,0,0.7))' }}
       >
         <div className="text-9xl md:text-[12rem]">
-          {isImagePath ? (
+          {isImage ? (
             <img src={wordData.image} alt={wordData.word} className="h-64 w-auto object-contain" />
           ) : (
             <span>{wordData.image}</span>
