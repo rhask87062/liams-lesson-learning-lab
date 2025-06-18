@@ -38,7 +38,8 @@ function App() {
   useEffect(() => {
     // This helps initialize ResponsiveVoice and deals with browser restrictions on audio.
     if (window.responsiveVoice) {
-      window.responsiveVoice.speak(" ", "UK English Female", { volume: 0 });
+      window.responsiveVoice.setDefaultVoice('US English Female');
+      window.responsiveVoice.speak(' ', 'US English Female', { volume: 0 });
     }
   }, []);
 
