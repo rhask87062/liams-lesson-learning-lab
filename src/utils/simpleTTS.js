@@ -18,10 +18,20 @@ if (typeof responsiveVoice !== 'undefined') {
   }, 100);
 }
 
+// Pronunciation corrections
+const pronunciationFixes = {
+  'dino': 'dyeno',
+};
+
 export const speak = (text, { rate = 1, pitch = 1, voice = 'US English Female', onend } = {}) => {
+  const textToSpeak = pronunciationFixes[text.toLowerCase()] || text;
   // Try ResponsiveVoice first if it's loaded and ready
   if (typeof responsiveVoice !== 'undefined' && responsiveVoiceReady) {
-    console.log('Using ResponsiveVoice with voice:', voice);
+    if (textToSpeak !== text) {
+      console.log(`Speaking "${textToSpeak}" (corrected from "${text}")`);
+    } else {
+      console.log(`Speaking "${textToSpeak}"`);
+    }
     
     // Try different US voice options
     const voiceOptions = [
@@ -48,7 +58,7 @@ export const speak = (text, { rate = 1, pitch = 1, voice = 'US English Female', 
     console.log('Selected voice:', selectedVoice);
     
     // Use the selected voice
-    responsiveVoice.speak(text, selectedVoice, {
+    responsiveVoice.speak(textToSpeak, selectedVoice, {
       rate: rate,
       pitch: pitch,
       onend: onend || function() {}
@@ -61,7 +71,7 @@ export const speak = (text, { rate = 1, pitch = 1, voice = 'US English Female', 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.rate = rate;
     utterance.pitch = pitch;
     
