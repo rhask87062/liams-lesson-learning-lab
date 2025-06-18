@@ -23,12 +23,69 @@ const pronunciationFixes = {
   'dino': 'dyeno',
 };
 
-export const speak = (text, { rate = 1, pitch = 1, voice = 'US English Female', onend } = {}) => {
+// A cache for the audio to avoid re-fetching from the API for the same text.
+const audioCache = {};
+let currentAudio = null; // To keep track of the currently playing audio
+
+export const speak = async (text, { rate = 1, pitch = 1, voice = 'US English Female', onend } = {}) => {
   const textToSpeak = pronunciationFixes[text.toLowerCase()] || text;
-  // Try ResponsiveVoice first if it's loaded and ready
+
+  // Stop any currently playing audio
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
+  
+  // --- Try Google WaveNet TTS first ---
+  try {
+     // If we have a cached audio, play it directly.
+    if (audioCache[textToSpeak]) {
+      console.log(`Playing "${textToSpeak}" from cache.`);
+      const audio = new Audio(audioCache[textToSpeak]);
+      currentAudio = audio;
+      audio.play();
+      if (onend) audio.onended = onend;
+      return;
+    }
+
+    console.log(`Fetching WaveNet audio for "${textToSpeak}"`);
+    // NOTE: You might need to adjust this URL if you set up a custom domain with Convex
+    const convexUrl = import.meta.env.VITE_CONVEX_URL;
+    const response = await fetch(`${convexUrl}/generateWavenetAudio`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: textToSpeak }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch audio, status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.error || !data.audioContent) {
+        throw new Error(`API returned an error: ${data.error || 'No audio content'}`);
+    }
+
+    const audioDataUri = `data:audio/mp3;base64,${data.audioContent}`;
+    audioCache[textToSpeak] = audioDataUri; // Cache the audio data
+
+    const audio = new Audio(audioDataUri);
+    currentAudio = audio;
+    audio.play();
+    if (onend) audio.onended = onend;
+    return; // Exit if WaveNet succeeded
+
+  } catch (error) {
+    console.warn('WaveNet TTS failed, falling back to other methods.', error);
+    // Continue to the fallback methods
+  }
+
+
+  // --- Fallback to ResponsiveVoice ---
   if (typeof responsiveVoice !== 'undefined' && responsiveVoiceReady) {
     if (textToSpeak !== text) {
-      console.log(`Speaking "${textToSpeak}" (corrected from "${text}")`);
+      console.log(`Speaking "${textToSpeak}" with ResponsiveVoice (corrected from "${text}")`);
     } else {
       console.log(`Speaking "${textToSpeak}"`);
     }
@@ -66,7 +123,7 @@ export const speak = (text, { rate = 1, pitch = 1, voice = 'US English Female', 
     return;
   }
   
-  // Fall back to browser's built-in speech synthesis
+  // --- Fallback to browser's built-in speech synthesis ---
   if ('speechSynthesis' in window) {
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
@@ -96,6 +153,12 @@ export const speak = (text, { rate = 1, pitch = 1, voice = 'US English Female', 
 };
 
 export const cancel = () => {
+  // Stop our custom audio player
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
   // Cancel ResponsiveVoice if available
   if (typeof responsiveVoice !== 'undefined') {
     responsiveVoice.cancel();
