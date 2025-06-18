@@ -6,7 +6,9 @@ import { generateImage } from '../services/OpenAI_API.js';
 
 const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
   const [newWord, setNewWord] = useState('');
+  const [newImage, setNewImage] = useState('');
   const [generatingImage, setGeneratingImage] = useState(null);
+  const [generatingNewImage, setGeneratingNewImage] = useState(false);
 
   // Helper function to download image and convert to base64
   const downloadAndConvertToBase64 = async (imageUrl) => {
@@ -30,10 +32,11 @@ const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
     if (newWord.trim()) {
       const newWordObj = {
         word: newWord.trim().toUpperCase(),
-        image: '❓' // Default emoji
+        image: newImage || '❓'
       };
       onWordListUpdate([...wordList, newWordObj]);
       setNewWord('');
+      setNewImage('');
     }
   };
 
@@ -60,6 +63,30 @@ const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
       alert('Failed to generate image. Please check your OpenAI API key and billing.');
     } finally {
       setGeneratingImage(null);
+    }
+  };
+
+  const handleGenerateNewImage = async () => {
+    if (!newWord.trim()) return;
+    setGeneratingNewImage(true);
+    try {
+      const imageUrl = await generateImage(newWord.trim());
+      const base64Image = await downloadAndConvertToBase64(imageUrl);
+      setNewImage(base64Image);
+    } catch (error) {
+      console.error('Error generating or saving image:', error);
+      alert('Failed to generate image. Please check your OpenAI API key and billing.');
+    } finally {
+      setGeneratingNewImage(false);
+    }
+  };
+
+  const handleNewImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setNewImage(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -122,10 +149,40 @@ const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
               placeholder="Add new word..."
               className="flex-1"
             />
+            <label>
+              <Button asChild className="bg-gray-500/80 hover:bg-gray-600/80">
+                <span>Upload</span>
+              </Button>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleNewImageUpload}
+                className="hidden"
+              />
+            </label>
+            <Button
+              onClick={handleGenerateNewImage}
+              disabled={generatingNewImage || !newWord.trim()}
+              className="bg-purple-500 hover:bg-purple-600"
+            >
+              {generatingNewImage ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+            </Button>
             <Button onClick={handleAddWord} className="bg-blue-500 hover:bg-blue-600">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
+          {newImage && (
+            <div className="flex items-center mb-4 gap-2">
+              <img src={newImage} alt="preview" className="h-10 w-10 object-contain" />
+              <Button onClick={() => setNewImage('')} size="sm" variant="destructive">
+                Clear
+              </Button>
+            </div>
+          )}
 
           <div className="flex gap-2 mb-4">
             <Button onClick={exportWordList} className="flex-1">
