@@ -11,6 +11,7 @@ if (typeof responsiveVoice !== 'undefined') {
   const checkInterval = setInterval(() => {
     if (responsiveVoice.voiceSupport()) {
       responsiveVoiceReady = true;
+      responsiveVoice.setDefaultVoice('US English Female');
       console.log('ResponsiveVoice is ready!');
       clearInterval(checkInterval);
     }
