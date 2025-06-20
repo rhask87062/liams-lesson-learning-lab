@@ -2,20 +2,25 @@ import { useState } from 'react';
 import { BookOpen, Sparkles, BarChart3, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 
-const RootMenu = ({ onSelectActivity, onLock, isNavigationLocked, onProgressDashboard }) => {
+const RootMenu = ({ onSelectActivity, onProgressDashboard }) => {
   const activities = [
     {
       id: 'spelling',
       title: 'Spelling Games',
-      description: 'Learn and practice spelling words',
       icon: BookOpen,
       color: 'from-blue-400 to-purple-600',
       emoji: '📚'
     },
     {
+      id: 'matching-game',
+      title: 'Matching Game',
+      icon: Sparkles,
+      color: 'from-teal-400 to-cyan-500',
+      emoji: '🧩'
+    },
+    {
       id: 'letter-learner',
       title: 'Letter Learner',
-      description: 'Touch letters to hear words',
       icon: Type,
       color: 'from-orange-400 to-pink-500',
       emoji: '🔤'
@@ -23,7 +28,6 @@ const RootMenu = ({ onSelectActivity, onLock, isNavigationLocked, onProgressDash
     {
       id: 'magic-paint',
       title: 'Magic Paint',
-      description: 'Create colorful splash effects',
       icon: Sparkles,
       color: 'from-pink-400 to-orange-500',
       emoji: '✨'
@@ -31,41 +35,17 @@ const RootMenu = ({ onSelectActivity, onLock, isNavigationLocked, onProgressDash
     {
       id: 'progress',
       title: 'Progress Reports',
-      description: 'View learning progress and data',
       icon: BarChart3,
       color: 'from-green-400 to-green-600',
       emoji: '📊'
     }
   ];
 
-  const handleKeyPress = (e) => {
-    // Global hotkeys with modifiers
-    if (e.ctrlKey && (e.key === 'l' || e.key === 'L')) {
-      e.preventDefault();
-      onLock();
-      return;
-    }
-    
-    // Activity selection hotkeys
-    if (e.key === '1') {
-      onSelectActivity('spelling');
-    }
-    if (e.key === '2') {
-      onSelectActivity('letter-learner');
-    }
-    if (e.key === '3') {
-      onSelectActivity('magic-paint');
-    }
-    if (e.key === '4') {
-      onProgressDashboard();
-    }
-  };
+  // Keyboard handling is now done at the App level
 
   return (
     <div 
       className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100"
-      onKeyDown={handleKeyPress}
-      tabIndex={0}
     >
       {/* Header */}
       <div className="text-center mb-8 md:mb-12">
@@ -101,7 +81,6 @@ const RootMenu = ({ onSelectActivity, onLock, isNavigationLocked, onProgressDash
               <div className="text-6xl md:text-7xl mb-2">{activity.emoji}</div>
               <activity.icon className="h-8 w-8 md:h-12 md:w-12 mb-2" />
               <h2 className="text-2xl md:text-3xl font-bold">{activity.title}</h2>
-              <p className="text-lg md:text-xl opacity-90">{activity.description}</p>
             </div>
 
             {/* Number indicator */}
@@ -119,7 +98,7 @@ const RootMenu = ({ onSelectActivity, onLock, isNavigationLocked, onProgressDash
             <strong>How to play:</strong> Touch an activity or press the number keys
           </p>
           <p className="text-sm md:text-base text-gray-600 mt-2">
-            <strong>Keyboard shortcuts:</strong> 1 = Spelling Games, 2 = Letter Learner, 3 = Magic Paint, 4 = Progress, Ctrl+Shift+H = Home, Ctrl+L = Lock
+            <strong>Keyboard shortcuts:</strong> 1 = Spelling Games, 2 = Matching Game, 3 = Letter Learner, 4 = Magic Paint, 5 = Progress, Ctrl+Shift+H = Home
           </p>
         </div>
       </div>

@@ -9,22 +9,18 @@ import LetterLearner from './components/LetterLearner.jsx';
 import NavigationLockPrompt from './components/NavigationLockPrompt.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import { ProgressDashboard } from './components/ProgressDashboard.jsx';
-import TherapistDashboard from './components/TherapistDashboard.jsx';
 import MagicPaint from './components/MagicPaint.jsx';
 import MatchingGame from './components/MatchingGame.jsx';
 import WordListManager from './components/WordListManager.jsx';
-import { wordDatabase } from './lib/wordDatabase';
-import { unifiedWords as initialWords } from './lib/unifiedWordLibrary';
+import KeyboardGuide from './components/KeyboardGuide.jsx';
+import { getAllWords, speakWord as speak, stopSpeaking } from './lib/unifiedWordDatabase';
 import './App.css';
-import { useTherapistAuth } from './hooks/useTherapistAuth';
-
-// Helper to transform the initial grouped words into a flat array
-const transformInitialWords = (words) => {
-  return Object.values(words).flat();
-};
+import { useTherapistAuth } from './hooks/useTherapistAuth.js';
+import { Button } from '@/components/ui/button';
 
 function App() {
-  const [currentActivity, setCurrentActivity] = useState('root'); // 'root', 'spelling', 'magic-paint', 'progress', 'therapist'
+  console.log('App component rendering'); // Debug log
+  const [currentActivity, setCurrentActivity] = useState('root'); // 'root', 'spelling', 'magic-paint', 'progress'
   const [currentMode, setCurrentMode] = useState('menu'); // 'menu', 'learn', 'copy', 'fillblank', 'test'
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -32,16 +28,13 @@ function App() {
   const [isNavigationLocked, setIsNavigationLocked] = useState(false);
   const [showUnlockPrompt, setShowUnlockPrompt] = useState(false);
   const [showPWAInstallPrompt, setShowPWAInstallPrompt] = useState(false);
-  const { isAuthenticated, login, logout, createParentAccount } = useTherapistAuth();
-  const [wordList, setWordList] = useState(transformInitialWords(initialWords));
+  const { createParentAccount } = useTherapistAuth();
+  const [wordList, setWordList] = useState(getAllWords());
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
-  // Expose the account creation function to the window for one-time setup
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      window.createParentAccount = createParentAccount;
-      console.log('Parent account creation function is available. Type `createParentAccount({ ... })` in the console.');
-    }
-  }, [createParentAccount]);
+  // Initialize the auth hook. This makes the `createParentAccount` function
+  // available on the window object in development mode.
+  useTherapistAuth();
 
   useEffect(() => {
     // This helps initialize ResponsiveVoice and deals with browser restrictions on audio.
@@ -49,12 +42,48 @@ function App() {
       window.responsiveVoice.setDefaultVoice('US English Female');
       window.responsiveVoice.speak(' ', 'US English Female', { volume: 0 });
     }
+    
+    // Focus the app on load for keyboard navigation
+    const appElement = document.querySelector('.App');
+    if (appElement) {
+      appElement.focus();
+    }
   }, []);
 
-  const currentWord = wordDatabase[currentWordIndex];
+  // Add global keyboard listener
+  useEffect(() => {
+    const handleWindowKeyPress = (e) => {
+      console.log('Window key press detected:', e.key);
+      
+      // Skip keyboard handling if we're in letter-learner activity
+      // as it has its own keyboard handler
+      if (currentActivity === 'letter-learner') {
+        console.log('Skipping global handler - in letter learner');
+        return;
+      }
+      
+      handleGlobalKeyPress(e);
+    };
+
+    window.addEventListener('keydown', handleWindowKeyPress);
+    
+    return () => {
+      window.removeEventListener('keydown', handleWindowKeyPress);
+    };
+  }, [currentActivity, currentMode, isNavigationLocked]);
+
+  const currentWord = wordList[currentWordIndex];
 
   // Global keyboard handler
   const handleGlobalKeyPress = (e) => {
+    console.log('Key pressed:', e.key, 'Ctrl:', e.ctrlKey, 'Shift:', e.shiftKey);
+    
+    // Prevent handling if user is typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      console.log('Ignoring key press - user is in input field');
+      return;
+    }
+
     // Global hotkeys that work everywhere
     if (e.ctrlKey && e.shiftKey && (e.key === 'h' || e.key === 'H')) {
       e.preventDefault();
@@ -66,6 +95,88 @@ function App() {
       handleLock();
       return;
     }
+
+    // Navigation shortcuts (when not locked)
+    if (!isNavigationLocked) {
+      // Escape key to go back/home
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleHome();
+        return;
+      }
+
+      // Arrow keys for navigation in spelling modes
+      if (currentActivity === 'spelling' && currentMode !== 'menu') {
+        if (e.key === 'ArrowRight' || e.key === 'Enter') {
+          e.preventDefault();
+          handleNext();
+          return;
+        }
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          handleBack();
+          return;
+        }
+      }
+
+      // Number keys for menu selection
+      if (currentActivity === 'root') {
+        console.log('In root menu, checking number keys');
+        if (e.key === '1') {
+          console.log('Key 1 pressed - going to spelling');
+          e.preventDefault();
+          handleActivitySelect('spelling');
+          return;
+        }
+        if (e.key === '2') {
+          console.log('Key 2 pressed - going to letter learner');
+          e.preventDefault();
+          handleActivitySelect('letter-learner');
+          return;
+        }
+        if (e.key === '3') {
+          console.log('Key 3 pressed - going to magic paint');
+          e.preventDefault();
+          handleActivitySelect('magic-paint');
+          return;
+        }
+        if (e.key === '4') {
+          console.log('Key 4 pressed - going to progress');
+          e.preventDefault();
+          handleProgressDashboard();
+          return;
+        }
+      }
+
+      // Spelling menu shortcuts
+      if (currentActivity === 'spelling' && currentMode === 'menu') {
+        if (e.key === '1') {
+          e.preventDefault();
+          handleModeSelect('learn');
+          return;
+        }
+        if (e.key === '2') {
+          e.preventDefault();
+          handleModeSelect('copy');
+          return;
+        }
+        if (e.key === '3') {
+          e.preventDefault();
+          handleModeSelect('fillblank');
+          return;
+        }
+        if (e.key === '4') {
+          e.preventDefault();
+          handleModeSelect('test');
+          return;
+        }
+        if (e.key === '5') {
+          e.preventDefault();
+          handleModeSelect('matchingGame');
+          return;
+        }
+      }
+    }
   };
 
   const handleActivitySelect = (activity) => {
@@ -73,8 +184,8 @@ function App() {
     if (activity === 'spelling') {
       setCurrentMode('menu');
     }
-    // Auto-unlock when leaving spelling section
-    if (activity !== 'spelling' && isNavigationLocked) {
+    // Auto-unlock when leaving an activity
+    if (isNavigationLocked) {
       setIsNavigationLocked(false);
     }
   };
@@ -82,14 +193,6 @@ function App() {
   const handleProgressDashboard = () => {
     setCurrentActivity('progress');
     // Auto-unlock when going to progress dashboard
-    if (isNavigationLocked) {
-      setIsNavigationLocked(false);
-    }
-  };
-
-  const handleTherapistDashboard = () => {
-    setCurrentActivity('therapist');
-    // Auto-unlock when going to therapist dashboard
     if (isNavigationLocked) {
       setIsNavigationLocked(false);
     }
@@ -112,7 +215,7 @@ function App() {
 
   const handleNext = () => {
     setCurrentWordIndex((prev) => {
-      const nextIndex = prev < wordDatabase.length - 1 ? prev + 1 : 0;
+      const nextIndex = prev < wordList.length - 1 ? prev + 1 : 0;
       
       if (currentMode === 'fillblank' && nextIndex % 5 === 0 && difficulty < 3) {
         setDifficulty(prev => Math.min(prev + 1, 3));
@@ -163,8 +266,9 @@ function App() {
   };
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (event) => {
-      event.preventDefault();
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
       setShowPWAInstallPrompt(true);
     };
 
@@ -175,13 +279,32 @@ function App() {
     };
   }, []);
 
+  const handleInstallClick = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the PWA installation');
+        } else {
+          console.log('User dismissed the PWA installation');
+        }
+        setDeferredPrompt(null);
+        setShowPWAInstallPrompt(false);
+      });
+    }
+  };
+
+  const speakWord = (word) => {
+    speak(word);
+  };
+
   const renderCurrentScreen = () => {
     switch (currentActivity) {
       case 'root':
         return (
           <RootMenu
             onSelectActivity={handleActivitySelect}
-            onProgressDashboard={handleTherapistDashboard}
+            onProgressDashboard={handleProgressDashboard}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}
           />
@@ -189,64 +312,9 @@ function App() {
       case 'progress':
         return (
           <ProgressDashboard
-            progressData={{
-              totalSessions: 3,
-              totalWordsAttempted: 33,
-              totalWordsCorrect: 27,
-              timeSpent: 720000,
-              sessions: [
-                {
-                  startTime: new Date().toISOString(),
-                  mode: 'learn',
-                  wordsAttempted: 15,
-                  wordsCorrect: 12,
-                  duration: 300000,
-                  difficulty: 1
-                },
-                {
-                  startTime: new Date(Date.now() - 86400000).toISOString(),
-                  mode: 'copy',
-                  wordsAttempted: 10,
-                  wordsCorrect: 9,
-                  duration: 240000,
-                  difficulty: 1
-                },
-                {
-                  startTime: new Date(Date.now() - 172800000).toISOString(),
-                  mode: 'test',
-                  wordsAttempted: 8,
-                  wordsCorrect: 6,
-                  duration: 180000,
-                  difficulty: 2
-                }
-              ]
-            }}
-            generateReport={(timeframe) => ({
-              totalSessions: 3,
-              totalWordsAttempted: 33,
-              totalWordsCorrect: 27,
-              timeSpent: 720000,
-              recentSession: {
-                wordsAttempted: 8,
-                wordsCorrect: 6,
-                difficulty: 2
-              },
-              ...(timeframe === 'week' && { totalSessions: 2 }),
-              ...(timeframe === 'month' && { totalSessions: 3 })
-            })}
-            isAuthenticated={isAuthenticated}
-            handleTherapistDashboard={handleTherapistDashboard}
-            onWordListManager={handleWordListManager}
-            exportToCSV={() => ''}
-            clearAllData={() => console.log('Data cleared')}
             onHome={handleHome}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}
-          />
-        );
-      case 'therapist':
-        return (
-          <TherapistDashboard
             progressData={{
                 // This is placeholder data. In a real app, you'd fetch this
                 // from a secure source after authentication.
@@ -345,6 +413,14 @@ function App() {
             isNavigationLocked={isNavigationLocked}
           />
         );
+      case 'matching-game':
+        return (
+          <MatchingGame
+            onHome={handleHome}
+            onLock={handleLock}
+            isNavigationLocked={isNavigationLocked}
+          />
+        );
       default:
         return null;
     }
@@ -373,6 +449,9 @@ function App() {
 
         {/* PWA Install Prompt */}
         <PWAInstallPrompt showOnActivity={currentActivity === 'root'} />
+
+        {/* Keyboard Guide */}
+        <KeyboardGuide />
 
         {/* Main Content */}
         {renderCurrentScreen()}

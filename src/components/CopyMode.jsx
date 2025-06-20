@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button.jsx';
-import { speakWord } from '../lib/wordDatabase';
+import { Button } from '@/components/ui/button';
+import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
 const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked }) => {

@@ -152,6 +152,26 @@ export const speak = async (text, { rate = 1, pitch = 1, voice = 'US English Fem
   }
 };
 
+export const speakSequence = (items, delay = 800) => {
+  cancel(); // Stop any previous speech
+
+  // Add a small delay to ensure the speech system is ready
+  setTimeout(() => {
+    const speakItem = (index) => {
+      if (index >= items.length) return;
+
+      const currentItem = items[index];
+      const parameters = {
+        onend: () => setTimeout(() => speakItem(index + 1), delay)
+      };
+      
+      speak(currentItem, parameters);
+    };
+
+    speakItem(0);
+  }, 100);
+};
+
 export const cancel = () => {
   // Stop our custom audio player
   if (currentAudio) {

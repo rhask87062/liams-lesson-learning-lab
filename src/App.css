@@ -215,6 +215,47 @@
   user-select: none;
 }
 
+/* Make the app focusable */
+.App {
+  min-height: 100vh;
+  outline: none;
+}
+
+/* Enhanced keyboard focus styles */
+.keyboard-focus:focus {
+  outline: 3px solid #3B82F6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Input focus styles */
+input:focus {
+  outline: 3px solid #3B82F6;
+  outline-offset: -1px;
+}
+
+/* Button keyboard navigation indicator */
+button:focus-visible {
+  outline: 3px solid #3B82F6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Keyboard hint display */
+kbd {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  display: inline-block;
+  padding: 0.2em 0.4em;
+  font-size: 0.875em;
+  line-height: 1;
+  color: #1a202c;
+  background-color: #e2e8f0;
+  border: 1px solid #cbd5e0;
+  border-radius: 0.25rem;
+  box-shadow: inset 0 -1px 0 #cbd5e0;
+}
+
 /* Allow selection in input fields */
 input, textarea {
   -webkit-user-select: text;

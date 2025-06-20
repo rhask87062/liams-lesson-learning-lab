@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button.jsx';
+import { Button } from '@/components/ui/button';
 import { Home, Lock, LockOpen, X } from 'lucide-react';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { motion, AnimatePresence } from 'framer-motion';
-import { speakWord, speakLetter, speakSequence, stopSpeaking } from '../lib/wordDatabase.js';
+import { speakWord, speakLetter, speakSequence, stopSpeaking, getWordsForLetter } from '../lib/unifiedWordDatabase';
 import dinoBackground from '../assets/dino-background.png';
 import triceratopsIcon from '/src/assets/trike.png';
 import stegoIcon from '/src/assets/stego.png';
 
-const AlphabetGrid = ({ onLetterSelect }) => {
+const AlphabetGrid = ({ onLetterSelect, activeKey }) => {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   
   return (
@@ -24,7 +24,9 @@ const AlphabetGrid = ({ onLetterSelect }) => {
             hover:scale-105 hover:shadow-lg hover:z-10
             active:scale-95 transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:z-10
+            ${activeKey === letter ? 'bg-yellow-500/50 scale-110 ring-4 ring-yellow-400' : ''}
           `}
+          data-letter={letter}
         >
           {letter}
         </Button>
@@ -97,8 +99,14 @@ const Instructions = ({ onDismiss }) => (
     className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30"
   >
     <div className="bg-black/60 text-white rounded-lg p-4 text-center shadow-lg relative max-w-md">
-      <p className="font-bold">How to play: Touch a letter to hear words that start with it!</p>
-      <p className="text-sm">Keyboard shortcuts: Press any letter/number key</p>
+      <p className="font-bold text-lg mb-2">How to play: Touch a letter to hear words that start with it!</p>
+      <div className="text-sm space-y-1">
+        <p><strong>Keyboard shortcuts:</strong></p>
+        <p>• Press any letter key (A-Z) to hear a word</p>
+        <p>• Number keys: 1=A, 2=B, 3=C, etc.</p>
+        <p>• Escape = Return to menu</p>
+        <p>• Ctrl+L = Lock navigation</p>
+      </div>
       <button onClick={onDismiss} className="absolute top-[-10px] right-[-10px] bg-red-500 rounded-full p-1 hover:bg-red-600 transition-colors">
         <X size={20} />
       </button>
@@ -113,6 +121,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
   const { width, height } = useWindowSize();
   const [erupt, setErupt] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [activeKey, setActiveKey] = useState(null);
 
   useEffect(() => {
     const groupedWords = wordList.reduce((acc, wordObj) => {
@@ -126,25 +135,6 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
     setWordsByLetter(groupedWords);
   }, [wordList]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    function handleKeyPress(event) {
-      if (event.ctrlKey || event.metaKey) return;
-      
-      const key = event.key.toUpperCase();
-      if (/[A-Z]/.test(key) && key.length === 1) {
-        handleLetterSelect(key);
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, []);
-
   const handleLetterSelect = useCallback((letter) => {
     if (isNavigationLocked || isAnimating) return;
 
@@ -154,15 +144,74 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
       setPopupWord(wordToShow);
       setErupt(true);
       setIsAnimating(true);
+      setActiveKey(letter); // Highlight the active letter
       speakSequence([letter, wordToShow.word], 800);
 
       setTimeout(() => {
         setPopupWord(null);
         setErupt(false);
         setIsAnimating(false);
+        setActiveKey(null); // Remove highlight
       }, 4500);
     }
   }, [wordsByLetter, isNavigationLocked, isAnimating]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    function handleKeyPress(event) {
+      console.log('Letter Learner - Key pressed:', event.key);
+      
+      // Skip if user is typing in an input field
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      // Handle global shortcuts
+      if (event.ctrlKey && event.shiftKey && (event.key === 'h' || event.key === 'H')) {
+        event.preventDefault();
+        onHome();
+        return;
+      }
+      if (event.ctrlKey && (event.key === 'l' || event.key === 'L')) {
+        event.preventDefault();
+        onLock();
+        return;
+      }
+      
+      // Skip other ctrl/meta combinations
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      
+      const key = event.key.toUpperCase();
+      console.log('Letter Learner - Checking letter:', key);
+      
+      // Handle letter keys
+      if (/[A-Z]/.test(key) && key.length === 1) {
+        console.log('Letter Learner - Triggering letter:', key);
+        event.preventDefault();
+        handleLetterSelect(key);
+      } 
+      // Handle number keys (1-9 map to A-I, 0 maps to J)
+      else if (/[0-9]/.test(key)) {
+        event.preventDefault();
+        const letterIndex = key === '0' ? 9 : parseInt(key) - 1;
+        const letter = String.fromCharCode(65 + letterIndex); // A=65 in ASCII
+        if (letterIndex < 26) {
+          console.log('Letter Learner - Number key', key, 'maps to letter:', letter);
+          handleLetterSelect(letter);
+        }
+      }
+      // Handle Escape to go home
+      else if (event.key === 'Escape') {
+        event.preventDefault();
+        onHome();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleLetterSelect, onHome, onLock]);
 
   const dismissInstructions = () => {
     setShowInstructions(false);
@@ -210,7 +259,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
       </div>
 
       <div className="w-full h-full">
-        <AlphabetGrid onLetterSelect={handleLetterSelect} />
+        <AlphabetGrid onLetterSelect={handleLetterSelect} activeKey={activeKey} />
       </div>
 
       <AnimatePresence>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import { Volume2, Lock, LockOpen, Home, Check, X } from 'lucide-react';
-import { speakWord } from '../lib/wordDatabase';
+import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
 const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked }) => {
@@ -47,15 +47,27 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       checkSpelling();
     }
     if (e.key === 'Escape') {
+      e.preventDefault();
       onBack();
     }
-    // Ctrl+H or Alt+H for Home to avoid interference with spelling
+    // Ctrl+S for speak
+    if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+      e.preventDefault();
+      handleSpeak();
+    }
+    // Ctrl+Shift+H for Home
     if ((e.ctrlKey && e.shiftKey) && (e.key === 'h' || e.key === 'H')) {
       e.preventDefault();
       onHome();
+    }
+    // Ctrl+L for lock
+    if (e.ctrlKey && (e.key === 'l' || e.key === 'L')) {
+      e.preventDefault();
+      onLock();
     }
   };
 
@@ -185,7 +197,7 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
 
         {/* Keyboard shortcuts hint */}
         <div className="text-sm md:text-base text-gray-600 bg-white/50 rounded-xl p-3 md:p-4">
-          <p><strong>Keyboard shortcuts:</strong> Enter = Check, Ctrl+Shift+H = Home, Escape = Back</p>
+          <p><strong>Keyboard shortcuts:</strong> Enter = Check, Ctrl+S = Speak, Ctrl+Shift+H = Home, Ctrl+L = Lock, Escape = Back</p>
         </div>
       </div>
     </div>

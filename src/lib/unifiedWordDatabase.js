@@ -1,5 +1,5 @@
 // Enhanced word database with real photos for consistent curriculum
-import enhancedTTS from '../utils/enhancedTTS.js';
+import * as TTS from '../utils/simpleTTS.js';
 
 // Unified word database for all learning modes
 export const unifiedWordDatabase = {
@@ -146,7 +146,7 @@ export const getAllWords = () => {
 // Enhanced speech functions using simple TTS
 export const speakWord = async (word) => {
   try {
-    await enhancedTTS.speak(word);
+    await TTS.speak(word);
   } catch (error) {
     console.error('Error speaking word:', error);
   }
@@ -154,7 +154,7 @@ export const speakWord = async (word) => {
 
 export const speakLetter = async (letter) => {
   try {
-    await enhancedTTS.speak(letter, { rate: 0.6, pitch: 1.1 });
+    await TTS.speak(letter, { rate: 0.6, pitch: 1.1 });
   } catch (error) {
     console.error('Error speaking letter:', error);
   }
@@ -162,14 +162,14 @@ export const speakLetter = async (letter) => {
 
 export const speakSequence = async (items, delay = 800) => {
   try {
-    await enhancedTTS.speakSequence(items, delay);
+    await TTS.speakSequence(items, delay);
   } catch (error) {
     console.error('Error speaking sequence:', error);
   }
 };
 
 export const stopSpeaking = () => {
-  enhancedTTS.cancel();
+  TTS.cancel();
 };
 
 // Legacy exports for compatibility

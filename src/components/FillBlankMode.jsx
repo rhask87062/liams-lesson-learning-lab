@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
-import { speakWord } from '../lib/wordDatabase';
+import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
 const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked, difficulty = 1 }) => {

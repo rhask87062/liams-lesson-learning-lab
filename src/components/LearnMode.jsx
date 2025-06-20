@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button.jsx';
+import { Button } from '@/components/ui/button';
 import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
-import { speakWord } from '../lib/wordDatabase';
+import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
 const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLocked }) => {

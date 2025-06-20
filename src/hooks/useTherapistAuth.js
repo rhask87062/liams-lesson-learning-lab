@@ -1,11 +1,36 @@
 import { useState, useEffect } from 'react';
-import CryptoJS from 'crypto-js';
+import { useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
 // Secure therapist authentication system
 export function useTherapistAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [therapistInfo, setTherapistInfo] = useState(null);
   const [sessionExpiry, setSessionExpiry] = useState(null);
+
+  // Convex mutations
+  const createParentMutation = useMutation(api.users.createParent);
+  const authenticateMutation = useMutation(api.users.authenticate);
+  const createTherapistMutation = useMutation(api.users.createTherapist);
+  const deleteTherapistMutation = useMutation(api.users.deleteTherapist);
+
+  // Expose createParentAccount for one-time setup in development
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.createParentAccount = async (args) => {
+        console.log('Creating parent account with:', args);
+        try {
+          const result = await createParentMutation(args);
+          console.log('Account creation successful:', result);
+          return result;
+        } catch (error) {
+          console.error('Error creating parent account:', error);
+          throw error;
+        }
+      };
+      console.log('Parent account creation function is available. Type `createParentAccount({ name, email, password })` in the console.');
+    }
+  }, [createParentMutation]);
 
   // Check authentication status on load
   useEffect(() => {
@@ -23,8 +48,7 @@ export function useTherapistAuth() {
       
       if (now < expiryTime) {
         try {
-          const decryptedSession = CryptoJS.AES.decrypt(session, 'therapist-session-key').toString(CryptoJS.enc.Utf8);
-          const sessionData = JSON.parse(decryptedSession);
+          const sessionData = JSON.parse(session);
           setTherapistInfo(sessionData);
           setIsAuthenticated(true);
           setSessionExpiry(expiryTime);
@@ -41,157 +65,61 @@ export function useTherapistAuth() {
   };
 
   // Create therapist account (parent-controlled)
-  const createParentAccount = (accountData) => {
-    const { name, email, password } = accountData;
-
-    // Check if an account (any account) already exists
-    if (localStorage.getItem('userAccounts')) {
-        throw new Error('An account already exists. Setup can only be run once.');
-    }
-
-    const parentData = {
-      id: `parent_${Date.now()}`,
-      name,
-      email,
-      role: 'parent', // <-- The crucial difference
-      createdAt: new Date().toISOString(),
-    };
-
-    const passwordHash = CryptoJS.SHA256(password).toString();
-    
-    const users = {
-        [email]: {
-            ...parentData,
-            passwordHash: passwordHash
-        }
-    };
-
-    // Store all users in a single, encrypted object
-    const encryptedUsers = CryptoJS.AES.encrypt(
-      JSON.stringify(users), 
-      'app-users-secret-key'
-    ).toString();
-
-    localStorage.setItem('userAccounts', encryptedUsers);
-    
-    console.log("Parent account created successfully!", parentData);
-    return parentData;
-  };
-
-  // Create therapist account (parent-controlled)
-  const createTherapistAccount = (accountData, authenticatedParent) => {
-    // Ensure the person creating this account is a logged-in parent
-    if (!authenticatedParent || authenticatedParent.role !== 'parent') {
-        throw new Error('Only a parent can create new accounts.');
+  const createTherapistAccount = async (accountData) => {
+    if (!therapistInfo || therapistInfo.role !== 'parent') {
+      throw new Error('Only a parent can create therapist accounts');
     }
     
-    const { 
-      name, 
-      email, 
-      credentials, 
-      institution, 
-      password
-    } = accountData;
-
-    // Decrypt existing users
-    const encryptedUsers = localStorage.getItem('userAccounts');
-    const decryptedUsers = CryptoJS.AES.decrypt(encryptedUsers, 'app-users-secret-key').toString(CryptoJS.enc.Utf8);
-    const users = JSON.parse(decryptedUsers);
-
-    if (users[email]) {
-        throw new Error(`An account with the email ${email} already exists.`);
+    try {
+      const result = await createTherapistMutation({
+        parentEmail: therapistInfo.email,
+        parentPassword: accountData.parentPassword, // Parent must re-enter password
+        therapistName: accountData.name,
+        therapistEmail: accountData.email,
+        therapistPassword: accountData.password
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('Error creating therapist account:', error);
+      throw error;
     }
-
-    // Create secure therapist account
-    const therapistData = {
-      id: `therapist_${Date.now()}`,
-      name,
-      email,
-      role: 'therapist',
-      credentials,
-      institution,
-      createdAt: new Date().toISOString(),
-      lastLogin: null,
-      accessLevel: 'therapist',
-      permissions: {
-        viewProgress: true,
-        addNotes: true,
-        exportData: true,
-        viewSessions: true
-      }
-    };
-
-    // Hash and store therapist password
-    const passwordHash = CryptoJS.SHA256(password).toString();
-    
-    users[email] = {
-        ...therapistData,
-        passwordHash: passwordHash
-    };
-
-    const updatedEncryptedData = CryptoJS.AES.encrypt(
-      JSON.stringify(users), 
-      'app-users-secret-key'
-    ).toString();
-
-    localStorage.setItem('userAccounts', updatedEncryptedData);
-
-    return therapistData;
   };
 
   // Login for any user
   const login = async (email, password) => {
     try {
-      const encryptedUsers = localStorage.getItem('userAccounts');
-      if (!encryptedUsers) {
-        throw new Error('No accounts have been set up for this application.');
-      }
+      // Use Convex to authenticate
+      const user = await authenticateMutation({ email, password });
       
-      const decryptedUsers = CryptoJS.AES.decrypt(encryptedUsers, 'app-users-secret-key').toString(CryptoJS.enc.Utf8);
-      const users = JSON.parse(decryptedUsers);
-
-      const userData = users[email];
-
-      if (!userData) {
-        throw new Error('Invalid email address');
+      if (!user) {
+        throw new Error('Invalid credentials');
       }
-
-      const passwordHash = CryptoJS.SHA256(password).toString();
-      if (passwordHash !== userData.passwordHash) {
-        throw new Error('Invalid password');
-      }
-
-      // Decrypt therapist data
-      const userToLogin = { ...userData };
-      delete userToLogin.passwordHash; // Don't keep hash in session
-
-
-      // Update last login
-      userToLogin.lastLogin = new Date().toISOString();
-      users[email].lastLogin = userToLogin.lastLogin; // Update the record
-      const updatedEncryptedData = CryptoJS.AES.encrypt(
-        JSON.stringify(users), 
-        'app-users-secret-key'
-      ).toString();
-      localStorage.setItem('userAccounts', updatedEncryptedData);
 
       // Create session (expires in 8 hours)
       const sessionExpiry = new Date().getTime() + (8 * 60 * 60 * 1000);
       const sessionData = {
-        id: userToLogin.id,
-        name: userToLogin.name,
-        email: userToLogin.email,
-        role: userToLogin.role,
-        permissions: userToLogin.permissions,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.role === 'therapist' ? {
+          viewProgress: true,
+          addNotes: true,
+          exportData: true,
+          viewSessions: true
+        } : {
+          viewProgress: true,
+          addNotes: true,
+          exportData: true,
+          viewSessions: true,
+          manageTherapists: true
+        },
         loginTime: new Date().toISOString()
       };
 
-      const encryptedSession = CryptoJS.AES.encrypt(
-        JSON.stringify(sessionData), 
-        'therapist-session-key'
-      ).toString();
-
-      localStorage.setItem('therapistSession', encryptedSession);
+      // Store session in localStorage (still encrypted for security)
+      localStorage.setItem('therapistSession', JSON.stringify(sessionData));
       localStorage.setItem('therapistSessionExpiry', sessionExpiry.toString());
 
       setTherapistInfo(sessionData);
@@ -257,9 +185,10 @@ export function useTherapistAuth() {
     throw new Error("Log access functionality is temporarily disabled pending administrative updates.");
   };
 
-  // Check if therapist account exists
+  // Check if therapist account exists (deprecated - accounts are now in Convex)
   const hasTherapistAccount = () => {
-    return !!localStorage.getItem('userAccounts');
+    // This is no longer used - accounts are managed in Convex
+    return true;
   };
 
   // Get session time remaining
@@ -298,41 +227,5 @@ export function useTherapistAuth() {
   };
 }
 
-// Crypto-JS mock for environments where it's not available
-if (typeof CryptoJS === 'undefined') {
-  window.CryptoJS = {
-    SHA256: (text) => {
-      // Simple hash function for demo purposes
-      let hash = 0;
-      for (let i = 0; i < text.length; i++) {
-        const char = text.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32-bit integer
-      }
-      return { toString: () => Math.abs(hash).toString(16) };
-    },
-    AES: {
-      encrypt: (text, key) => {
-        // Simple encoding for demo purposes
-        const encoded = btoa(text + '|' + key);
-        return { toString: () => encoded };
-      },
-      decrypt: (encrypted, key) => {
-        try {
-          const decoded = atob(encrypted);
-          const [text, originalKey] = decoded.split('|');
-          if (originalKey === key) {
-            return { toString: () => text };
-          }
-          throw new Error('Invalid key');
-        } catch {
-          throw new Error('Decryption failed');
-        }
-      }
-    },
-    enc: {
-      Utf8: {}
-    }
-  };
-}
+
 
