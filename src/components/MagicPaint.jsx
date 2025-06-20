@@ -1,15 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
-import { Home, Settings, Palette, Sparkles, Zap, Waves, Brush, Lock, LockOpen } from 'lucide-react';
+import { Home, Settings, Palette, Sparkles, Zap, Waves, Brush, Lock, LockOpen, Droplets } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import { SplashCursor } from './ui/splash-cursor.jsx';
 
 const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
   const canvasRef = useRef(null);
-  const [currentEffect, setCurrentEffect] = useState('splash');
+  const [currentEffect, setCurrentEffect] = useState('splashCursor');
   const cleanupRef = useRef(null);
   const isDrawingRef = useRef(false);
   const lastPositionRef = useRef({ x: 0, y: 0 });
 
   const effects = [
+    {
+      id: 'splashCursor',
+      name: 'Fluid Splash',
+      icon: Droplets,
+      description: 'Interactive fluid color splash',
+      color: 'from-cyan-400 to-blue-600'
+    },
     {
       id: 'splash',
       name: 'Misty Colors',
@@ -699,93 +707,58 @@ const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
     }
   };
 
+  if (currentEffect === 'splashCursor') {
+    return (
+      <div className="w-screen h-screen bg-black">
+        <SplashCursor />
+        {/* UI Controls */}
+        <div className="absolute top-4 right-4 flex flex-col space-y-2 z-50">
+          {effects.map((effect) => (
+            <Button
+              key={effect.id}
+              onClick={() => setCurrentEffect(effect.id)}
+              className={`flex items-center justify-start space-x-2 w-48 transition-all duration-300 ${
+                currentEffect === effect.id
+                  ? `bg-gradient-to-r ${effect.color} text-white shadow-lg`
+                  : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/70'
+              }`}
+            >
+              <effect.icon className="h-5 w-5" />
+              <span>{effect.name}</span>
+            </Button>
+          ))}
+        </div>
+        <Button onClick={onHome} className="absolute top-4 left-4 bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 z-50">
+          <Home className="h-5 w-5" />
+        </Button>
+      </div>
+    );
+  }
+
+  // Fallback for other effects
   return (
-    <div 
-      className="relative w-screen h-screen bg-black overflow-hidden"
-      onKeyDown={handleKeyPress}
-      tabIndex={0}
-    >
-      {/* Canvas for effects */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full cursor-crosshair"
-        style={{ touchAction: 'none' }}
-      />
-
-      {/* Header UI */}
-      <div className="absolute bottom-4 right-4 z-50 flex gap-2">
-        <Button
-          onClick={onLock}
-          className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-500 hover:bg-gray-600'} text-white rounded-lg`}
-        >
-          {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
-        </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
-        </Button>
+    <div className="w-screen h-screen bg-black relative">
+      <canvas ref={canvasRef} className="w-full h-full" />
+      {/* UI Controls */}
+      <div className="absolute top-4 right-4 flex flex-col space-y-2">
+        {effects.map((effect) => (
+          <Button
+            key={effect.id}
+            onClick={() => setCurrentEffect(effect.id)}
+            className={`flex items-center justify-start space-x-2 w-48 transition-all duration-300 ${
+              currentEffect === effect.id
+                ? `bg-gradient-to-r ${effect.color} text-white shadow-lg`
+                : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/70'
+            }`}
+          >
+            <effect.icon className="h-5 w-5" />
+            <span>{effect.name}</span>
+          </Button>
+        ))}
       </div>
-
-      {/* Main Toolbar */}
-      <div className="absolute top-4 left-4 z-50 flex flex-col gap-2 bg-white/80 p-2 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4 flex items-center">
-          <Sparkles className="h-6 w-6 mr-2" />
-          Magic Paint
-        </h2>
-        
-        {/* Effect Selection */}
-        <div className="space-y-2 mb-4">
-          <p className="text-sm text-gray-300">Choose Effect:</p>
-          <div className="grid grid-cols-2 gap-2">
-            {effects.map((effect, index) => (
-              <Button
-                key={effect.id}
-                onClick={() => setCurrentEffect(effect.id)}
-                className={`p-3 rounded-xl text-left transition-all ${
-                  currentEffect === effect.id
-                    ? `bg-gradient-to-r ${effect.color} text-white shadow-lg scale-105`
-                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <effect.icon className="h-4 w-4" />
-                  <div>
-                    <div className="font-medium text-sm">{effect.name}</div>
-                    <div className="text-xs opacity-75">{index + 1}</div>
-                  </div>
-                </div>
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="text-xs text-gray-400 space-y-1">
-          <p>• Touch or drag to create effects</p>
-          <p>• Press 1-4 to switch effects</p>
-          <p>• Ctrl+Shift+H for Home, Ctrl+L to Lock</p>
-        </div>
-      </div>
-
-      {/* Current Effect Display */}
-      <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-xl p-3 text-white z-10">
-        <div className="flex items-center space-x-2">
-          {(() => {
-            const currentEffectData = effects.find(e => e.id === currentEffect);
-            const IconComponent = currentEffectData?.icon;
-            return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
-          })()}
-          <span className="font-medium">
-            {effects.find(e => e.id === currentEffect)?.name}
-          </span>
-        </div>
-        <p className="text-xs text-gray-400 mt-1">
-          {effects.find(e => e.id === currentEffect)?.description}
-        </p>
-      </div>
+      <Button onClick={onHome} className="absolute top-4 left-4 bg-gray-700/50 text-gray-300 hover:bg-gray-600/70">
+        <Home className="h-5 w-5" />
+      </Button>
     </div>
   );
 };
