@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import HomeButton from '@/components/HomeButton.jsx';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -108,7 +109,7 @@ const MatchingGame = ({ onHome, optionsCount = 3 }) => {
             <div className="absolute bottom-8 right-8 flex items-center space-x-4 z-10">
                  {selectionStatus === 'correct' && <CheckCircle2 className="h-16 w-16 text-green-500" />}
                  {selectionStatus === 'incorrect' && <XCircle className="h-16 w-16 text-red-500" />}
-                <Button onClick={onHome}>Back to Menu</Button>
+                <HomeButton onClick={onHome} />
             </div>
         </div>
     );

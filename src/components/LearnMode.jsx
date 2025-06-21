@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
+import { Volume2, Lock, LockOpen } from 'lucide-react';
+import HomeButton from '@/components/HomeButton.jsx';
 import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
@@ -53,13 +54,7 @@ const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLo
         >
           {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
         </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
-        </Button>
+        <HomeButton onClick={onHome} />
       </div>
 
       {/* Navigation lock indicator */}

@@ -6,9 +6,10 @@ import {
 import { 
   Calendar as CalendarIcon, Clock, TrendingUp, Award, BookOpen, 
   Target, MessageSquare, Download, LogOut, User,
-  CheckCircle, AlertCircle, Activity, Brain, Home, Lock, LockOpen
+  CheckCircle, AlertCircle, Activity, Brain, Lock, LockOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import HomeButton from '@/components/HomeButton.jsx';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
@@ -364,13 +365,7 @@ const DashboardContent = ({
               )}
         
               {/* Home Button */}
-              <Button
-                onClick={onHome}
-                    className="p-2 h-9 w-9 bg-gray-100 text-gray-600"
-                title="Home (Ctrl+Shift+H)"
-              >
-                <Home size={20} />
-              </Button>
+              <HomeButton onClick={onHome} className="p-2 h-9 w-9" />
 
               {/* User Dropdown Menu */}
               <DropdownMenu>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { BookOpen, Home, Lock, LockOpen } from 'lucide-react';
+import { BookOpen, Lock, LockOpen } from 'lucide-react';
+import HomeButton from '@/components/HomeButton.jsx';
 import { Button } from '@/components/ui/button.jsx';
 
 const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
@@ -85,13 +86,7 @@ const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
         >
           {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
         </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
-        </Button>
+        <HomeButton onClick={onHome} />
       </div>
 
       {/* Header */}

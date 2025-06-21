@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
-import { Trash2, Plus, Download, Home, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Download, Loader2 } from 'lucide-react';
+import HomeButton from '@/components/HomeButton.jsx';
 import { generateImage } from '../services/OpenAI_API.js';
 
 const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
@@ -273,13 +274,7 @@ const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
         </div>
       </div>
       
-      <Button 
-        onClick={onHome} 
-        className="fixed bottom-4 right-4 bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0 z-50"
-        title="Home (Ctrl+Shift+H)"
-      >
-        <Home className="h-6 w-6" />
-      </Button>
+      <HomeButton onClick={onHome} className="fixed bottom-4 right-4 z-50" size={24} />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, Lock, LockOpen, X } from 'lucide-react';
+import { Lock, LockOpen, X } from 'lucide-react';
+import HomeButton from '@/components/HomeButton.jsx';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -249,13 +250,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
         >
           {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
         </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
-        </Button>
+        <HomeButton onClick={onHome} />
       </div>
 
       <div className="w-full h-full">

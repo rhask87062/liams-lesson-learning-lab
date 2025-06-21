@@ -5,6 +5,7 @@ import {
   FileText, Settings, Play, Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import HomeButton from './HomeButton.jsx';
 
 const TherapistFeatureRequest = ({ therapistInfo, onSubmitRequest }) => {
   const [requests, setRequests] = useState([]);
@@ -394,13 +395,12 @@ const ${spec.componentName} = ({
       {/* Consistent header with clear navigation */}
       <header className={styles.header}>
         <h1 className={styles.title}>${spec.componentName.replace(/([A-Z])/g, ' $1').trim()}</h1>
-        <Button
+        <HomeButton
           onClick={onNavigateHome}
           className={styles.homeButton}
           aria-label="Go to main menu"
-        >
-          <Home className="h-5 w-5" />
-        </Button>
+          size={20}
+        />
       </header>
 
       {/* Feedback area with consistent styling */}

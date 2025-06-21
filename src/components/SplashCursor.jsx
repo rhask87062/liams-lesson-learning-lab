@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { Home, Lock, LockOpen } from "lucide-react";
+import { Lock, LockOpen } from "lucide-react";
+import HomeButton from "./HomeButton.jsx";
 
 function SplashCursor({
   onHome,
@@ -1415,13 +1416,7 @@ function SplashCursor({
       
       {/* Control buttons */}
       <div className="absolute top-4 right-4 flex gap-2 z-10">
-        <button
-          onClick={onHome}
-          className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-xl shadow-lg transition-colors"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={24} />
-        </button>
+        <HomeButton onClick={onHome} className="p-3 rounded-xl shadow-lg transition-colors" size={24} />
         <button
           onClick={onLock}
           className={`${
