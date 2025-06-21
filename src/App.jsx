@@ -31,6 +31,7 @@ function App() {
   const { createParentAccount } = useTherapistAuth();
   const [wordList, setWordList] = useState(getAllWords());
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [stars, setStars] = useState([]);
 
   // Initialize the auth hook. This makes the `createParentAccount` function
   // available on the window object in development mode.
@@ -99,6 +100,68 @@ function App() {
       .animate-fly-by {
         animation: fly-by 15s linear infinite;
       }
+
+      .space-background {
+        background: linear-gradient(to bottom right, black, #4f46e5, #8b5cf6);
+        overflow: hidden;
+      }
+
+      .text-xxxs {
+        font-size: 0.3rem; /* 9.6px */
+        line-height: 0.3rem; /* 12.8px */
+      }
+
+      .text-xxs {
+        font-size: 0.5rem; /* 9.6px */
+        line-height: 0.5rem; /* 12.8px */
+      }
+        
+      .text-s {
+        font-size: 0.7rem; /* 9.6px */
+        line-height: 0.7rem; /* 12.8px */
+      }
+
+      @keyframes gentle-bounce {
+        0%, 100% {
+          transform: translateY(-25%) rotate(-2deg);
+        }
+        50% {
+          transform: translateY(-20%) rotate(2deg);
+        }
+      }
+
+      .animate-gentle-bounce {
+        animation: gentle-bounce 9s ease-in-out infinite;
+      }
+
+      @keyframes rocket-fly-by {
+        0% {
+          transform: translate(-10vw, 120vh) scale(0.6) rotate(25deg);
+          opacity: 0;
+        }
+        25% {
+          transform: translate(20vw, 70vh) scale(1) rotate(27deg);
+          opacity: 1;
+        }
+        50% {
+          transform: translate(55vw, 45vh) scale(1) rotate(30deg);
+          opacity: 1;
+        }
+        75% {
+          transform: translate(90vw, 25vh) scale(1) rotate(35deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(120vw, 10vh) scale(0.6) rotate(38deg);
+          opacity: 0;
+        }
+      }
+
+      .animate-rocket-fly-by {
+        animation: rocket-fly-by 20s linear infinite;
+        animation-delay: 0s;
+        animation-fill-mode: backwards;
+      }
     `;
     document.head.appendChild(style);
 
@@ -107,6 +170,33 @@ function App() {
       document.head.removeChild(style);
     };
   }, []);
+
+  useEffect(() => {
+    if (currentActivity === 'spelling') {
+      const starEmojis = ['⭐'];
+      const starSizes = ['text-xxxs', 'text-xxs', 'text-xs'];
+      
+      const generalStars = Array.from({ length: 100 }, () => ({
+        emoji: starEmojis[Math.floor(Math.random() * starEmojis.length)],
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        size: starSizes[Math.floor(Math.random() * starSizes.length)],
+        delay: `${Math.random() * 5}s`,
+      }));
+
+      const bottomLeftStars = Array.from({ length: 20 }, () => ({
+        emoji: starEmojis[Math.floor(Math.random() * starEmojis.length)],
+        top: `${50 + Math.random() * 50}%`,
+        left: `${Math.random() * 50}%`,
+        size: starSizes[Math.floor(Math.random() * starSizes.length)],
+        delay: `${Math.random() * 5}s`,
+      }));
+
+      setStars([...generalStars, ...bottomLeftStars]);
+    } else {
+      setStars([]);
+    }
+  }, [currentActivity]);
 
   const currentWord = wordList[currentWordIndex];
 
@@ -335,6 +425,7 @@ function App() {
   };
 
   const renderCurrentScreen = () => {
+    console.log('Rendering screen:', currentActivity, currentMode); // Debug log
     switch (currentActivity) {
       case 'root':
         return (
@@ -463,36 +554,20 @@ function App() {
   };
 
   return (
-    <>
-      <div className="App" onKeyDown={handleGlobalKeyPress} tabIndex={0}>
-        {/* Score display for spelling activities */}
-        {currentActivity === 'spelling' && currentMode !== 'menu' && (
-          <div className="fixed top-4 left-4 bg-white rounded-xl p-3 shadow-lg z-40">
-            <p className="text-base md:text-lg font-semibold">Score: {score}</p>
-            {currentMode === 'fillblank' && (
-              <p className="text-sm text-gray-600">Level: {difficulty}</p>
-            )}
-          </div>
-        )}
-
-        {/* Navigation Lock Prompt */}
-        {showUnlockPrompt && (
-          <NavigationLockPrompt
-            onUnlock={handleUnlock}
-            onCancel={() => setShowUnlockPrompt(false)}
-          />
-        )}
-
-        {/* PWA Install Prompt */}
-        <PWAInstallPrompt showOnActivity={currentActivity === 'root'} />
-
-        {/* Keyboard Guide */}
-        <KeyboardGuide />
-
-        {/* Main Content */}
-        {renderCurrentScreen()}
-      </div>
-    </>
+    <div className={`App ${currentActivity === 'spelling' ? 'space-background' : ''}`} tabIndex={-1} style={{ outline: 'none' }}>
+      {currentActivity === 'spelling' && stars.map((star, i) => (
+        <div
+          key={i}
+          className={`absolute animate-pulse ${star.size}`}
+          style={{ top: star.top, left: star.left, animationDelay: star.delay, pointerEvents: 'none' }}
+        >
+          {star.emoji}
+        </div>
+      ))}
+      <PWAInstallPrompt deferredPrompt={deferredPrompt} onInstall={handleInstallClick} />
+      {showUnlockPrompt && <NavigationLockPrompt onUnlock={handleUnlock} />}
+      {renderCurrentScreen()}
+    </div>
   );
 }
 

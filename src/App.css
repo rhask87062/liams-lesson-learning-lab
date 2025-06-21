@@ -179,7 +179,7 @@
     transform: translate3d(0, 0, 0);
   }
   40%, 43% {
-    transform: translate3d(0, -15px, 0);
+    transform: translate3d(0, -13px, 0);
   }
   70% {
     transform: translate3d(0, -7px, 0);
