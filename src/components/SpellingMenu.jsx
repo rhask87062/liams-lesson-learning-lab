@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Home, Lock, LockOpen } from 'lucide-react';
+import { BookOpen, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 
-const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
+const SpellingMenu = ({ onSelectMode, onHome }) => {
   const modes = [
     {
       id: 'learn',
@@ -41,11 +41,6 @@ const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
       onHome();
       return;
     }
-    if (e.ctrlKey && (e.key === 'l' || e.key === 'L')) {
-      e.preventDefault();
-      onLock();
-      return;
-    }
     
     // Mode selection hotkeys
     if (e.key === '1') onSelectMode('learn');
@@ -61,74 +56,84 @@ const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
   };
 
   return (
-    <div 
-      className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative"
-      onKeyDown={handleKeyPress}
-      tabIndex={0}
-    >
-      {/* Space Adventure themed background elements (now handled by App.jsx) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 text-5xl animate-rocket-fly-by">🚀</div>
-        <div className="absolute bottom-10 right-10 text-5xl animate-gentle-bounce">🛸</div>
-        <div className="absolute top-1/5 left-1/5 text-6xl">🌙</div>
-        <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
-        <div className="absolute top-0 right-20 text-4xl animate-fly-by">☄️</div>
-      </div>
-      {/* Header with home button */}
-      <div className="absolute bottom-4 right-4 z-10 flex gap-2">
-        <Button
-          onClick={onLock}
-          className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-500 hover:bg-gray-600'} text-white rounded-lg`}
-        >
-          {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
-        </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
-        </Button>
-      </div>
-
-      {/* Header */}
-      <div className="text-center mb-8 md:mb-12 relative z-10">
-        <div className="text-8xl md:text-9xl mb-4">📚</div>
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
-          Spelling Games
-        </h1>
-        <p className="text-xl md:text-2xl text-gray-600">
-          Learn and practice spelling with fun!
-        </p>
-      </div>
-
-      {/* Mode Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-4xl relative z-10">
-        {modes.map((mode, index) => (
+    <>
+      <style>{`
+        @keyframes cow-abduction {
+          0%, 100% {
+            transform: translateX(0) translateY(0) rotate(-4deg);
+          }
+          50% {
+            transform: translateX(-3px) translateY(-1px) rotate(4deg);
+          }
+        }
+        .animate-cow-abduction {
+          animation: cow-abduction 4s ease-in-out infinite;
+        }
+      `}</style>
+      <div 
+        className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative"
+        onKeyDown={handleKeyPress}
+        tabIndex={0}
+      >
+        {/* Space Adventure themed background elements (now handled by App.jsx) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 text-5xl animate-rocket-fly-by">🚀</div>
+          <div className="absolute bottom-10 right-12 text-5xl animate-gentle-bounce">🛸</div>
+          <div className="absolute top-1/5 left-1/5 text-6xl">🌙</div>
+          <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
+          <div className="absolute top-0 right-20 text-4xl animate-fly-by">☄️</div>
+        </div>
+        {/* Header with home button */}
+        <div className="absolute bottom-6 right-4 z-10 flex items-center gap-2">
+          <div className="text-4xl animate-cow-abduction">🐄</div>
           <Button
-            key={mode.id}
-            onClick={() => onSelectMode(mode.id)}
-            className={`relative h-40 md:h-48 p-6 md:p-8 bg-gradient-to-br ${mode.color} hover:scale-105 transform transition-all duration-300 shadow-xl hover:shadow-2xl rounded-3xl border-0 text-white group overflow-hidden`}
-            tabIndex={index + 1}
+            onClick={onHome}
+            className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
+            title="Home (Ctrl+Shift+H)"
           >
-            {/* Background decoration */}
-            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            
-            {/* Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center space-y-3">
-              <div className="text-4xl md:text-5xl mb-2">{mode.emoji}</div>
-              <h2 className="text-xl md:text-2xl font-bold">{mode.title}</h2>
-              <p className="text-base md:text-lg opacity-90">{mode.description}</p>
-            </div>
-
-            {/* Number indicator */}
-            <div className="absolute top-3 right-3 bg-white/20 rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
-              <span className="text-sm md:text-base font-bold">{index + 1}</span>
-            </div>
+            <Home size={20} />
           </Button>
-        ))}
+        </div>
+
+        {/* Header */}
+        <div className="text-center mb-8 md:mb-12 relative z-10 text-white">
+          <div className="text-8xl md:text-9xl mb-4">📚</div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            Spelling Games
+          </h1>
+          <p className="text-xl md:text-2xl">
+            Learn and practice spelling with fun!
+          </p>
+        </div>
+
+        {/* Mode Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-4xl relative z-10">
+          {modes.map((mode, index) => (
+            <Button
+              key={mode.id}
+              onClick={() => onSelectMode(mode.id)}
+              className={`relative h-40 md:h-48 p-6 md:p-8 bg-gradient-to-br ${mode.color} hover:scale-105 transform transition-all duration-300 shadow-xl hover:shadow-2xl rounded-3xl border-0 text-white group overflow-hidden`}
+              tabIndex={index + 1}
+            >
+              {/* Background decoration */}
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Content */}
+              <div className="relative z-10 flex flex-col items-center justify-center h-full text-center space-y-3">
+                <div className="text-4xl md:text-5xl mb-2">{mode.emoji}</div>
+                <h2 className="text-xl md:text-2xl font-bold">{mode.title}</h2>
+                <p className="text-base md:text-lg opacity-90">{mode.description}</p>
+              </div>
+
+              {/* Number indicator */}
+              <div className="absolute top-3 right-3 bg-white/20 rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
+                <span className="text-sm md:text-base font-bold">{index + 1}</span>
+              </div>
+            </Button>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -123,42 +123,42 @@ function App() {
 
       @keyframes gentle-bounce {
         0%, 100% {
-          transform: translateY(-25%) rotate(-2deg);
+          transform: translateY(-25%) rotate(-5deg);
         }
         50% {
-          transform: translateY(-20%) rotate(2deg);
+          transform: translateY(-23%) rotate(5deg);
         }
       }
 
       .animate-gentle-bounce {
-        animation: gentle-bounce 9s ease-in-out infinite;
+        animation: gentle-bounce 4s ease-in-out infinite;
       }
 
       @keyframes rocket-fly-by {
         0% {
-          transform: translate(-10vw, 120vh) scale(0.6) rotate(25deg);
+          transform: translate(-10vw, 120vh) scale(0.6) rotate(0deg);
           opacity: 0;
         }
         25% {
-          transform: translate(20vw, 70vh) scale(1) rotate(27deg);
+          transform: translate(20vw, 70vh) scale(1) rotate(5deg);
           opacity: 1;
         }
         50% {
-          transform: translate(55vw, 45vh) scale(1) rotate(30deg);
+          transform: translate(55vw, 45vh) scale(1) rotate(10deg);
           opacity: 1;
         }
         75% {
-          transform: translate(90vw, 25vh) scale(1) rotate(35deg);
+          transform: translate(90vw, 25vh) scale(1) rotate(15deg);
           opacity: 1;
         }
         100% {
-          transform: translate(120vw, 10vh) scale(0.6) rotate(38deg);
+          transform: translate(120vw, 10vh) scale(0.6) rotate(20deg);
           opacity: 0;
         }
       }
 
       .animate-rocket-fly-by {
-        animation: rocket-fly-by 20s linear infinite;
+        animation: rocket-fly-by 13s linear infinite;
         animation-delay: 0s;
         animation-fill-mode: backwards;
       }
