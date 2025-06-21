@@ -75,6 +75,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  user-select: text;
 }
 
 .dark {
@@ -124,6 +125,7 @@
     user-select: none;
     /* Prevent zoom on double tap */
     touch-action: manipulation;
+    overflow: hidden;
   }
   
   /* Allow text selection only in input fields */
@@ -263,5 +265,33 @@ input, textarea {
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+}
+
+@keyframes fly-by {
+  0% {
+    transform: translate(100vw, -100vh) scale(0);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(50vw, -50vh) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50vw, 50vh) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-100vw, 100vh) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-fly-by {
+  animation: fly-by 30s linear infinite;
+  animation-delay: 5s;
+}
+
+body {
+  overflow: hidden;
 }
 

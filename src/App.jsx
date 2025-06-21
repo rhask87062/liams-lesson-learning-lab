@@ -72,6 +72,42 @@ function App() {
     };
   }, [currentActivity, currentMode, isNavigationLocked]);
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes fly-by {
+        0% {
+          transform: translate(100vw, -100vh) scale(0);
+          opacity: 0;
+        }
+        30% {
+          transform: translate(50vw, -50vh) scale(1);
+          opacity: 1;
+        }
+        70% {
+          transform: translate(-50vw, 50vh) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-100vw, 100vh) scale(0);
+          opacity: 0;
+        }
+      }
+
+      .animate-fly-by {
+        animation: fly-by 15s linear infinite;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.body.style.overflow = 'auto';
+      document.head.removeChild(style);
+    };
+  }, []);
+
   const currentWord = wordList[currentWordIndex];
 
   // Global keyboard handler

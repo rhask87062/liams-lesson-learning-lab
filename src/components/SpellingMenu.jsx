@@ -1,8 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen, Home, Lock, LockOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 
 const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
+  const [stars, setStars] = useState([]);
+
+  useEffect(() => {
+    const starEmojis = ['✨', '⭐'];
+    const starSizes = ['text-xs', 'text-sm', 'text-lg', 'text-xl', 'text-2xl'];
+    
+    // Generate stars across the whole screen
+    const generalStars = Array.from({ length: 100 }, () => ({
+      emoji: starEmojis[Math.floor(Math.random() * starEmojis.length)],
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: starSizes[Math.floor(Math.random() * starSizes.length)],
+      delay: `${Math.random() * 5}s`,
+    }));
+
+    // Generate extra stars for the bottom-left quadrant
+    const bottomLeftStars = Array.from({ length: 40 }, () => ({
+      emoji: starEmojis[Math.floor(Math.random() * starEmojis.length)],
+      top: `${50 + Math.random() * 50}%`, // 50% to 100%
+      left: `${Math.random() * 50}%`,      // 0% to 50%
+      size: starSizes[Math.floor(Math.random() * starSizes.length)],
+      delay: `${Math.random() * 5}s`,
+    }));
+
+    setStars([...generalStars, ...bottomLeftStars]);
+  }, []);
+
   const modes = [
     {
       id: 'learn',
@@ -68,14 +95,20 @@ const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
     >
       {/* Space Adventure themed background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {stars.map((star, i) => (
+          <div
+            key={i}
+            className={`absolute animate-pulse ${star.size}`}
+            style={{ top: star.top, left: star.left, animationDelay: star.delay }}
+          >
+            {star.emoji}
+          </div>
+        ))}
         <div className="absolute top-10 left-10 text-5xl animate-bounce">🚀</div>
-        <div className="absolute top-20 right-20 text-4xl animate-pulse">⭐</div>
-        <div className="absolute bottom-20 left-20 text-6xl animate-bounce delay-1000">🌟</div>
-        <div className="absolute bottom-10 right-10 text-5xl animate-pulse delay-500">🛸</div>
-        <div className="absolute top-1/2 left-5 text-3xl animate-bounce delay-700">🌙</div>
-        <div className="absolute top-1/3 right-5 text-4xl animate-pulse delay-300">✨</div>
-        <div className="absolute bottom-1/3 left-1/4 text-3xl animate-bounce delay-200">🪐</div>
-        <div className="absolute top-1/4 right-1/3 text-4xl animate-pulse delay-800">☄️</div>
+        <div className="absolute bottom-10 right-10 text-5xl animate-bounce delay-500">🛸</div>
+        <div className="absolute top-1/5 left-1/5 text-6xl">🌙</div>
+        <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
+        <div className="absolute top-0 right-20 text-4xl animate-fly-by">☄️</div>
       </div>
       {/* Header with home button */}
       <div className="absolute bottom-4 right-4 z-10 flex gap-2">
@@ -130,35 +163,6 @@ const SpellingMenu = ({ onSelectMode, onHome, onLock, isNavigationLocked }) => {
             </div>
           </Button>
         ))}
-      </div>
-
-      {/* Instructions */}
-      <div className="mt-8 md:mt-12 text-center relative z-10">
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg max-w-3xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
-            <div>
-              <p className="text-gray-700 mb-2">
-                <strong>Learn Mode:</strong> See words with pictures and hear how they sound
-              </p>
-              <p className="text-gray-700">
-                <strong>Copy Mode:</strong> See the word and practice typing it
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-700 mb-2">
-                <strong>Fill Blanks:</strong> Complete words with missing letters
-              </p>
-              <p className="text-gray-700">
-                <strong>Test Mode:</strong> Spell words from pictures alone
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-gray-300">
-            <p className="text-gray-600">
-              <strong>Keyboard shortcuts:</strong> 1-4 = Select mode, Ctrl+Shift+H = Home, Ctrl+L = Lock
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
