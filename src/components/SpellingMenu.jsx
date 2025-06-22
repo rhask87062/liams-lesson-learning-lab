@@ -60,14 +60,25 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
       <style>{`
         @keyframes cow-abduction {
           0%, 100% {
-            transform: translateX(0) translateY(0) rotate(-4deg);
+            transform: translateX(0) translateY(1px) rotate(6deg);
           }
           50% {
-            transform: translateX(-3px) translateY(-1px) rotate(4deg);
+            transform: translateX(-6px) translateY(-1px) rotate(-6deg);
           }
         }
         .animate-cow-abduction {
           animation: cow-abduction 4s ease-in-out infinite;
+        }
+        @keyframes gentle-rock {
+          0%, 100% {
+            transform: rotate(-5deg);
+          }
+          50% {
+            transform: rotate(5deg);
+          }
+        }
+        .animate-gentle-rock {
+          animation: gentle-rock 9s ease-in-out infinite;
         }
       `}</style>
       <div 
@@ -79,13 +90,13 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 text-5xl animate-rocket-fly-by">🚀</div>
           <div className="absolute bottom-10 right-12 text-5xl animate-gentle-bounce">🛸</div>
-          <div className="absolute top-1/5 left-1/5 text-6xl">🌙</div>
+          <div className="absolute top-1/5 left-1/5 text-6xl animate-gentle-rock">🌙</div>
           <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
           <div className="absolute top-0 right-20 text-4xl animate-fly-by">☄️</div>
         </div>
         {/* Header with home button */}
-        <div className="absolute bottom-6 right-4 z-10 flex items-center gap-2">
-          <div className="text-4xl animate-cow-abduction">🐄</div>
+        <div className="absolute bottom-7 right-4 z-10 flex items-center gap-2">
+          <div className="text-3xl animate-cow-abduction">🐄</div>
           <Button
             onClick={onHome}
             className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"

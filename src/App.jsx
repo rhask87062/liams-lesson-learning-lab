@@ -158,7 +158,7 @@ function App() {
       }
 
       .animate-rocket-fly-by {
-        animation: rocket-fly-by 13s linear infinite;
+        animation: rocket-fly-by 9s linear infinite;
         animation-delay: 0s;
         animation-fill-mode: backwards;
       }
