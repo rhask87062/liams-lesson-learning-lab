@@ -80,6 +80,21 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         .animate-gentle-rock {
           animation: gentle-rock 9s ease-in-out infinite;
         }
+        @keyframes satellite-pass {
+          0% {
+            transform: translateX(-10vw) translateY(20vh) rotate(0deg);
+          }
+          100% {
+            transform: translateX(110vw) translateY(20vh) rotate(360deg);
+          }
+        }
+        .animate-satellite-pass {
+          animation: satellite-pass 50s linear infinite;
+          animation-delay: 3s;
+        }
+        .celestial-glow {
+          filter: drop-shadow(0 0 6px rgba(255, 255, 224, 0.8));
+        }
       `}</style>
       <div 
         className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative"
@@ -90,9 +105,10 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 text-5xl animate-rocket-fly-by">🚀</div>
           <div className="absolute bottom-10 right-12 text-5xl animate-gentle-bounce">🛸</div>
-          <div className="absolute top-1/5 left-1/5 text-6xl animate-gentle-rock">🌙</div>
+          <div className="absolute top-1/5 left-1/5 text-6xl animate-gentle-rock celestial-glow">🌙</div>
           <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
           <div className="absolute top-0 right-20 text-4xl animate-fly-by">☄️</div>
+          <div className="absolute text-5xl animate-satellite-pass">🛰️</div>
         </div>
         {/* Header with home button */}
         <div className="absolute bottom-7 right-4 z-10 flex items-center gap-2">

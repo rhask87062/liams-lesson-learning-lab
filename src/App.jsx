@@ -98,11 +98,11 @@ function App() {
       }
 
       .animate-fly-by {
-        animation: fly-by 15s linear infinite;
+        animation: fly-by 18s linear infinite;
       }
 
       .space-background {
-        background: linear-gradient(to bottom right, black, #4f46e5, #8b5cf6);
+        background: linear-gradient(to bottom right, black,rgb(5, 0, 96),rgb(21, 0, 183));
         overflow: hidden;
       }
 
@@ -159,7 +159,7 @@ function App() {
 
       .animate-rocket-fly-by {
         animation: rocket-fly-by 9s linear infinite;
-        animation-delay: 0s;
+        animation-delay: 3s;
         animation-fill-mode: backwards;
       }
     `;
@@ -558,7 +558,7 @@ function App() {
       {currentActivity === 'spelling' && stars.map((star, i) => (
         <div
           key={i}
-          className={`absolute animate-pulse ${star.size}`}
+          className={`absolute animate-pulse ${star.size} celestial-glow`}
           style={{ top: star.top, left: star.left, animationDelay: star.delay, pointerEvents: 'none' }}
         >
           {star.emoji}
