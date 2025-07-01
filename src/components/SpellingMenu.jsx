@@ -91,6 +91,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         .animate-satellite-pass {
           animation: satellite-pass 50s linear infinite;
           animation-delay: 3s;
+          animation-fill-mode: backwards;
         }
         .celestial-glow {
           filter: drop-shadow(0 0 6px rgba(255, 255, 224, 0.8));
@@ -165,4 +166,3 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
 };
 
 export default SpellingMenu;
-
