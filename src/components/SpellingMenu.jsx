@@ -99,32 +99,6 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           animation-delay: 3s;
           animation-fill-mode: backwards;
         }
-        @keyframes rocket-fly-by {
-          0% {
-            transform: translateX(-100px) translateY(50px) rotate(-15deg);
-            opacity: 0.7;
-          }
-          25% {
-            transform: translateX(50px) translateY(-20px) rotate(10deg);
-            opacity: 1;
-          }
-          50% {
-            transform: translateX(150px) translateY(30px) rotate(-5deg);
-            opacity: 1;
-          }
-          75% {
-            transform: translateX(250px) translateY(-10px) rotate(15deg);
-            opacity: 0.8;
-          }
-          100% {
-            transform: translateX(400px) translateY(60px) rotate(-20deg);
-            opacity: 0.3;
-          }
-        }
-        .animate-rocket-fly-by {
-          animation: rocket-fly-by 25s linear infinite;
-          animation-delay: 2s;
-        }
         @keyframes gentle-bounce {
           0%, 100% {
             transform: translateY(0px) rotate(0deg);
@@ -157,7 +131,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={rocket} 
             alt="Rocket" 
-            className="absolute top-10 left-10 w-12 h-12 md:w-16 md:h-16 animate-rocket-fly-by" 
+            className="absolute top-10 left-10 w-12 h-12 md:w-16 md:h-16 animate-fly-by" 
           />
           <img 
             src={ufo} 
