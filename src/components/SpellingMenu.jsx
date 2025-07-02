@@ -150,7 +150,6 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by" 
           />
           <div className="absolute text-5xl animate-satellite-pass">🛰️</div>
-          <div className="absolute top-1/3 right-1/4 text-4xl">⭐</div>
         </div>
         {/* Header with home button */}
         <div className="absolute bottom-7 right-4 z-10 flex items-center gap-2">
@@ -166,17 +165,6 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           >
             <Home size={20} />
           </Button>
-        </div>
-
-        {/* Header */}
-        <div className="text-center mb-8 md:mb-12 relative z-10 text-white">
-          <div className="text-8xl md:text-9xl mb-4">📚</div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Spelling Games
-          </h1>
-          <p className="text-xl md:text-2xl">
-            Learn and practice spelling with fun!
-          </p>
         </div>
 
         {/* Mode Grid */}
