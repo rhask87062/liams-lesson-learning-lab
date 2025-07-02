@@ -130,17 +130,23 @@ This minimal, targeted fix achieves the goal without breaking existing functiona
 - **Consistent Interactions**: Progress button now has same hover effects as lab equipment (glow, scale, label animation)
 
 ## Session Conclusion
-Successfully transformed the RootMenu into an immersive lab experience with interactive equipment serving as game navigation. The banner.png title is properly sized and positioned at the top, while all lab assets (telescope, microscope, computer, fossil) have engaging hover effects with colored glows, scaling animations, and styled labels. The progress button maintains consistent interaction patterns with glow effects and labeling. The entire interface now provides a cohesive, playful learning environment. 
+Successfully transformed the RootMenu into an immersive lab experience with interactive equipment serving as game navigation. The banner.png title is properly sized and positioned at the top, while all lab assets (telescope, microscope, computer, fossil) have engaging hover effects with colored glows, scaling animations, and styled labels. The progress button maintains consistent interaction patterns with glow effects and labeling. The entire interface now provides a cohesive, playful learning environment.
+
+### Hover Area Fix - Final Session Task
+- **Problem Identified**: Hover effects only triggered when hovering over label text, not the entire asset area
+- **Solution Implemented**: Removed Button components and restructured clickable areas as divs with extended hover zones
+- **Enhanced Accessibility**: Added tabIndex and onKeyDown handlers for proper keyboard navigation
+- **Padding Extension**: Added `p-8` class to expand clickable/hoverable area around each lab asset
+- **Navigation Preserved**: Maintained all original asset positions and click functionality for proper game routing
 
 ### Lab Asset Navigation Implementation
 - **Major UI Transformation**: Replaced gradient card buttons with interactive lab assets
 - **Asset-to-Game Mapping**: 
   - Telescope → Spelling Games (positioned by window)
-  - Microscope → Letter Learner (left counter)
-  - Chemistry Set → Magic Paint (bottom left) 
-  - Computer → Matching Game (bottom right)
-  - Whiteboard → Progress Reports (top center)
-- **Interactive Features**: Hover effects with scaling, opacity changes, and drop shadows
-- **Permanent Labels**: Game names displayed below each asset with semi-transparent backgrounds
+  - Microscope → Matching Game (left counter) 
+  - Computer → Magic Paint (center bottom)
+  - Fossil → Letter Learner (left bottom)
+- **Interactive Features**: Hover effects with scaling, colored glows, and smooth transitions
+- **Permanent Labels**: Game names displayed below each asset with Impact font styling
 - **Immersive Experience**: Users now click on actual lab equipment to access learning activities
-- **Accessibility Preserved**: Maintained keyboard navigation and tab indices 
+- **Accessibility Preserved**: Full keyboard navigation with tab indices and Enter/Space key support 
