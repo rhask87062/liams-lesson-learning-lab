@@ -29,8 +29,8 @@ const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLo
   };
 
   return (
-    <div 
-      className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-500 via-green-400 via-teal-500 to-blue-600 relative overflow-hidden"
+          <div
+        className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-500 via-green-400 via-teal-500 to-blue-600 relative overflow-hidden"
       onKeyDown={handleKeyPress}
       tabIndex={0}
     >

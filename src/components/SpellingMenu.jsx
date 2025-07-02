@@ -97,7 +97,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           filter: drop-shadow(0 0 6px rgba(255, 255, 224, 0.8));
         }
       `}</style>
-      <div 
+            <div
         className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative"
         onKeyDown={handleKeyPress}
         tabIndex={0}

@@ -74,6 +74,7 @@ function App() {
   }, [currentActivity, currentMode, isNavigationLocked]);
 
   useEffect(() => {
+    // Always maintain overflow hidden to prevent unwanted scrolling
     document.body.style.overflow = 'hidden';
 
     const style = document.createElement('style');

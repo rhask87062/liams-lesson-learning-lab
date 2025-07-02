@@ -72,8 +72,8 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
   };
 
   return (
-    <div 
-      className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-purple-500 via-orange-400 via-red-500 to-purple-600 relative overflow-hidden"
+          <div
+        className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-purple-500 via-orange-400 via-red-500 to-purple-600 relative overflow-hidden"
       onKeyDown={handleKeyPress}
       tabIndex={0}
     >

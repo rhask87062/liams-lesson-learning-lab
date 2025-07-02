@@ -1081,7 +1081,7 @@ const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
   const isComponentEffect = ['splashCursor', 'fluidCanvas', 'gradientTrail'].includes(currentEffect);
 
   return (
-    <div className="w-screen h-screen bg-black relative">
+    <div className="w-screen h-screen bg-black relative overflow-hidden">
       {isComponentEffect ? (
         <>
           {currentEffect === 'splashCursor' && <SplashCursor />}

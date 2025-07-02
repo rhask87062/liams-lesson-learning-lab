@@ -267,6 +267,13 @@ input, textarea {
   user-select: text;
 }
 
+
+
+/* Ensure full height inheritance for React root */
+#root {
+  min-height: 100vh;
+}
+
 @keyframes fly-by {
   0% {
     transform: translate(100vw, -100vh) scale(0);

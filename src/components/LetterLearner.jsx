@@ -219,8 +219,8 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
   };
 
   return (
-    <div
-      className="w-screen h-screen bg-cover bg-center overflow-hidden"
+          <div
+        className="w-screen h-screen bg-cover bg-center overflow-hidden"
       style={{ backgroundImage: `url(${dinoBackground})` }}
     >
       <AnimatePresence>

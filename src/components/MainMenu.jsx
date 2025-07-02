@@ -15,8 +15,8 @@ const MainMenu = ({ onSelectMode }) => {
   };
 
   return (
-    <div 
-      className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-b from-blue-50 to-green-50"
+          <div 
+        className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-b from-blue-50 to-green-50"
       onKeyDown={handleKeyPress}
       tabIndex={0}
     >
@@ -136,11 +136,6 @@ const MainMenu = ({ onSelectMode }) => {
             <strong>Lock:</strong> Press the lock button to prevent accidental exits
           </p>
         </div>
-      </div>
-
-      {/* Keyboard shortcuts hint */}
-      <div className="mt-6 text-sm md:text-base text-gray-600 bg-white/50 rounded-xl p-3 md:p-4">
-        <p><strong>Keyboard shortcuts:</strong> 1 = Learn, 2 = Copy, 3 = Fill Blanks, 4 = Test</p>
       </div>
     </div>
   );

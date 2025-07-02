@@ -111,7 +111,7 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-yellow-400 via-lime-400 via-orange-400 to-yellow-500 relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-yellow-400 via-lime-400 via-orange-400 to-yellow-500 relative overflow-hidden">
       {/* Tropical Fruit themed background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 text-5xl animate-bounce">🍍</div>

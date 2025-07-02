@@ -133,7 +133,7 @@ const WordListManager = ({ wordList, onWordListUpdate, onHome }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="h-full max-h-screen bg-gray-100 p-8 overflow-auto">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-center items-center mb-6">
           <h1 className="text-3xl font-bold text-center">Manage Word List</h1>
