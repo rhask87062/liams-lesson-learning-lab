@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { BookOpen, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+// Import the new space-themed assets
+import moon from '../assets/moon.png';
+import meteor from '../assets/meteor.png';
+import ufo from '../assets/ufo.png';
+import cow from '../assets/cow.png';
+import rocket from '../assets/rocket.png';
 
 const SpellingMenu = ({ onSelectMode, onHome }) => {
   const modes = [
@@ -93,6 +99,50 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           animation-delay: 3s;
           animation-fill-mode: backwards;
         }
+        @keyframes rocket-fly-by {
+          0% {
+            transform: translateX(-100px) translateY(50px) rotate(-15deg);
+            opacity: 0.7;
+          }
+          25% {
+            transform: translateX(50px) translateY(-20px) rotate(10deg);
+            opacity: 1;
+          }
+          50% {
+            transform: translateX(150px) translateY(30px) rotate(-5deg);
+            opacity: 1;
+          }
+          75% {
+            transform: translateX(250px) translateY(-10px) rotate(15deg);
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(400px) translateY(60px) rotate(-20deg);
+            opacity: 0.3;
+          }
+        }
+        .animate-rocket-fly-by {
+          animation: rocket-fly-by 25s linear infinite;
+          animation-delay: 2s;
+        }
+        @keyframes gentle-bounce {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          25% {
+            transform: translateY(-8px) rotate(2deg);
+          }
+          50% {
+            transform: translateY(-15px) rotate(0deg);
+          }
+          75% {
+            transform: translateY(-8px) rotate(-2deg);
+          }
+        }
+        .animate-gentle-bounce {
+          animation: gentle-bounce 6s ease-in-out infinite;
+          animation-delay: 1s;
+        }
         .celestial-glow {
           filter: drop-shadow(0 0 6px rgba(255, 255, 224, 0.8));
         }
@@ -102,18 +152,39 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         onKeyDown={handleKeyPress}
         tabIndex={0}
       >
-        {/* Space Adventure themed background elements (now handled by App.jsx) */}
+        {/* Space Adventure themed background elements with image assets */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 text-5xl animate-rocket-fly-by">🚀</div>
-          <div className="absolute bottom-10 right-12 text-5xl animate-gentle-bounce">🛸</div>
-          <div className="absolute top-1/5 left-1/5 text-6xl animate-gentle-rock celestial-glow">🌙</div>
+          <img 
+            src={rocket} 
+            alt="Rocket" 
+            className="absolute top-10 left-10 w-12 h-12 md:w-16 md:h-16 animate-rocket-fly-by" 
+          />
+          <img 
+            src={ufo} 
+            alt="UFO" 
+            className="absolute bottom-10 right-12 w-12 h-12 md:w-16 md:h-16 animate-gentle-bounce" 
+          />
+          <img 
+            src={moon} 
+            alt="Moon" 
+            className="absolute top-1/5 left-1/5 w-16 h-16 md:w-20 md:h-20 animate-gentle-rock celestial-glow" 
+          />
           <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
-          <div className="absolute top-0 right-20 text-4xl animate-fly-by">☄️</div>
+          <img 
+            src={meteor} 
+            alt="Meteor" 
+            className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by" 
+          />
           <div className="absolute text-5xl animate-satellite-pass">🛰️</div>
+          <div className="absolute top-1/3 right-1/4 text-4xl">⭐</div>
         </div>
         {/* Header with home button */}
         <div className="absolute bottom-7 right-4 z-10 flex items-center gap-2">
-          <div className="text-3xl animate-cow-abduction">🐄</div>
+          <img 
+            src={cow} 
+            alt="Cow" 
+            className="w-8 h-8 md:w-10 md:h-10 animate-cow-abduction" 
+          />
           <Button
             onClick={onHome}
             className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
