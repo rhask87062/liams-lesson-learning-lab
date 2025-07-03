@@ -157,23 +157,23 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         // Animation for the Rocket asset on the Spelling Menu app
         @keyframes rocket-fly-by {
             0% {
-                transform: translate(-10vw, 120vh) scale(0.6) rotate(50deg);
+                transform: translate(-10vw, 120vh) scale(0.6) rotate(35deg);
                 opacity: 0;
             }
             25% {
-                transform: translate(20vw, 70vh) scale(1) rotate(40deg);
+                transform: translate(20vw, 70vh) scale(1) rotate(35deg);
                 opacity: 1;
             }
             50% {
-                transform: translate(55vw, 45vh) scale(1) rotate(40deg);
+                transform: translate(55vw, 45vh) scale(1) rotate(35deg);
                 opacity: 1;
             }
             75% {
-                transform: translate(90vw, 25vh) scale(1) rotate(40deg);
+                transform: translate(90vw, 25vh) scale(1) rotate(35deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(120vw, 10vh) scale(0.6) rotate(40deg);
+                transform: translate(120vw, 10vh) scale(0.6) rotate(35deg);
                 opacity: 0;
             }
         }
