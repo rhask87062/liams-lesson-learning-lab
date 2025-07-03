@@ -402,7 +402,18 @@ const DashboardContent = ({
   };
 
     return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col overflow-hidden relative">
+        {/* Home button - absolute top right */}
+        <div className="absolute top-4 right-4 z-50">
+          <Button
+            onClick={onHome}
+            className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-gray-300 text-black"
+          >
+            <Home className="mr-2" size={20} />
+            Home
+          </Button>
+        </div>
+
         {/* Header */}
       <div className="bg-white shadow-sm border-b flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -472,15 +483,6 @@ const DashboardContent = ({
                       Extend Session
                   </Button>
               )}
-        
-              {/* Home Button */}
-              <Button
-                onClick={onHome}
-                className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
-              >
-                <Home className="mr-2" size={20} />
-                Home
-              </Button>
 
               {/* User Dropdown Menu */}
               <DropdownMenu>

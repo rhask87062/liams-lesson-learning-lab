@@ -6,7 +6,7 @@ import CopyMode from './components/CopyMode.jsx';
 import FillBlankMode from './components/FillBlankMode.jsx';
 import TestMode from './components/TestMode.jsx';
 import LetterLearner from './components/LetterLearner.jsx';
-import NavigationLockPrompt from './components/NavigationLockPrompt.jsx';
+import MathLockDialog from './components/ui/MathLockDialog.jsx';
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx';
 import { ProgressDashboard } from './components/ProgressDashboard.jsx';
 import MagicPaint from './components/MagicPaint.jsx';
@@ -475,6 +475,7 @@ function App() {
                 onNext={handleNext}
                 onBack={handleBack}
                 onHome={handleHome}
+                onLock={handleLock}
                 onCorrect={handleCorrectAnswer}
                 isNavigationLocked={isNavigationLocked}
               />
@@ -557,7 +558,11 @@ function App() {
         </div>
       ))}
       <PWAInstallPrompt deferredPrompt={deferredPrompt} onInstall={handleInstallClick} />
-      {showUnlockPrompt && <NavigationLockPrompt onUnlock={handleUnlock} />}
+      <MathLockDialog 
+        isOpen={showUnlockPrompt} 
+        onClose={() => setShowUnlockPrompt(false)} 
+        onUnlock={handleUnlock} 
+      />
       {renderCurrentScreen()}
     </div>
   );

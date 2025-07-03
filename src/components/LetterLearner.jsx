@@ -266,25 +266,22 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
         )}
       </AnimatePresence>
       
-      {/* Home button - top right */}
-      <div className="absolute top-4 right-4 z-20">
-        <Button
-          onClick={onHome}
-          className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
-        >
-          <Home className="mr-2" size={20} />
-          Home
-        </Button>
-      </div>
-
-      {/* Lock button - bottom right */}
-      <div className="absolute bottom-4 right-4 z-30">
+      {/* Navigation buttons - top right */}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
         <Button
           onClick={onLock}
           className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500/70 hover:bg-orange-600/70' : 'bg-gray-500/70 hover:bg-gray-600/70'} text-white border-0`}
           title={isNavigationLocked ? "Unlock Navigation (Ctrl+L)" : "Lock Navigation (Ctrl+L)"}
         >
           {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
+        </Button>
+        <Button
+          onClick={onHome}
+          className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+          disabled={isNavigationLocked}
+        >
+          <Home className="mr-2" size={20} />
+          Home
         </Button>
       </div>
 
