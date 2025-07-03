@@ -366,4 +366,22 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
   - Replaced NavigationLockPrompt with MathLockDialog in App.jsx
   - Added lock buttons to all game modes (next to home button)
   - Lock button disables home navigation until math problem solved
-  - All lock buttons positioned consistently in top-right with home button 
+  - All lock buttons positioned consistently in top-right with home button
+
+## Session 20: SpellingMenu Z-Index Layering Fix
+- **Issue**: Rocket passing below moon, incorrect z-axis depth ordering
+- **Solution**:
+  - Added explicit z-index values to space elements based on realistic depth
+  - Stars: z-index 0 (furthest back, handled in App.jsx)
+  - Jupiter: z-index 1 (second furthest)
+  - Moon: z-index 2 (third furthest)
+  - Meteor: z-index 5 (mid-range)
+  - Satellite: z-index 6 (mid-range)
+  - UFO: z-index 7 (foreground)
+  - Rocket: z-index 8 (foreground)
+  - Cow: z-index 9 (closest to viewer)
+- **Cow Animation Update**:
+  - Changed from simple abduction animation to slow spiral drift
+  - 20-second animation cycle with smooth transitions
+  - Positioned at bottom-16 right-16 for better corner drifting
+  - Spiral movement with rotation for more natural floating effect 

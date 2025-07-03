@@ -64,16 +64,25 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
   return (
     <>
       <style>{`
-        @keyframes cow-abduction {
-          0%, 100% {
-            transform: translateX(0) translateY(1px) rotate(6deg);
+        @keyframes cow-drift {
+          0% {
+            transform: translateX(0) translateY(0) rotate(0deg);
+          }
+          25% {
+            transform: translateX(-30px) translateY(-20px) rotate(15deg);
           }
           50% {
-            transform: translateX(-6px) translateY(-1px) rotate(-6deg);
+            transform: translateX(-50px) translateY(10px) rotate(-10deg);
+          }
+          75% {
+            transform: translateX(-20px) translateY(30px) rotate(5deg);
+          }
+          100% {
+            transform: translateX(0) translateY(0) rotate(0deg);
           }
         }
-        .animate-cow-abduction {
-          animation: cow-abduction 4s ease-in-out infinite;
+        .animate-cow-drift {
+          animation: cow-drift 20s ease-in-out infinite;
         }
         @keyframes gentle-rock {
           0%, 100% {
@@ -126,30 +135,37 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         onKeyDown={handleKeyPress}
         tabIndex={0}
       >
-        {/* Space Adventure themed background elements with image assets */}
+        {/* Space Adventure themed background elements with proper z-index layering */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img 
-            src={rocket} 
-            alt="Rocket" 
-            className="absolute top-10 left-40 w-12 h-12 md:w-16 md:h-16 animate-fly-by" 
-          />
-          <img 
-            src={ufo} 
-            alt="UFO" 
-            className="absolute bottom-10 right-12 w-12 h-12 md:w-16 md:h-16 animate-gentle-bounce" 
-          />
+          {/* Jupiter - furthest back after stars */}
+          <div className="absolute bottom-1/3 left-1/8 text-5xl z-[1]">🪐</div>
+          
+          {/* Moon - second furthest back */}
           <img 
             src={moon} 
             alt="Moon" 
-            className="absolute top-1/5 left-1/5 w-16 h-16 md:w-20 md:h-20 animate-gentle-rock celestial-glow" 
+            className="absolute top-1/5 left-1/5 w-16 h-16 md:w-20 md:h-20 animate-gentle-rock celestial-glow z-[2]" 
           />
-          <div className="absolute bottom-1/3 left-1/8 text-5xl">🪐</div>
+          
+          {/* Mid-range objects */}
           <img 
             src={meteor} 
             alt="Meteor" 
-            className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by" 
+            className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by z-[5]" 
           />
-          <div className="absolute text-5xl animate-satellite-pass">🛰️</div>
+          <div className="absolute text-5xl animate-satellite-pass z-[6]">🛰️</div>
+          
+          {/* Foreground objects */}
+          <img 
+            src={ufo} 
+            alt="UFO" 
+            className="absolute bottom-10 right-12 w-12 h-12 md:w-16 md:h-16 animate-gentle-bounce z-[7]" 
+          />
+          <img 
+            src={rocket} 
+            alt="Rocket" 
+            className="absolute top-10 left-40 w-12 h-12 md:w-16 md:h-16 animate-fly-by z-[8]" 
+          />
         </div>
         {/* Home button - top right */}
         <div className="absolute top-4 right-4 z-20">
@@ -162,12 +178,12 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           </Button>
         </div>
         
-        {/* Cow animation - bottom right */}
-        <div className="absolute bottom-7 right-4 z-10">
+        {/* Cow animation - bottom right with slow drift */}
+        <div className="absolute bottom-16 right-16 z-[9]">
           <img 
             src={cow} 
             alt="Cow" 
-            className="w-8 h-8 md:w-10 md:h-10 animate-cow-abduction" 
+            className="w-8 h-8 md:w-10 md:h-10 animate-cow-drift" 
           />
         </div>
 

@@ -552,7 +552,13 @@ function App() {
         <div
           key={i}
           className={`absolute animate-pulse ${star.size} celestial-glow`}
-          style={{ top: star.top, left: star.left, animationDelay: star.delay, pointerEvents: 'none' }}
+          style={{ 
+            top: star.top, 
+            left: star.left, 
+            animationDelay: star.delay, 
+            pointerEvents: 'none',
+            zIndex: star.size === 'text-xxxs' ? 0 : star.size === 'text-xxs' ? 0 : 0
+          }}
         >
           {star.emoji}
         </div>

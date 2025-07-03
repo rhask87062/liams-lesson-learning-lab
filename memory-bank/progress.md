@@ -22,6 +22,7 @@
 - [x] Petri dish background as full screen with crosshair overlay
 - [x] Consistent letter display between floating items and target card
 - [x] Global home button standardization (top-right, glassmorphic style)
+- [x] Math verification lock system for child safety
 
 ### Teacher/Therapist Features
 - [x] Progress Dashboard with session tracking
@@ -30,6 +31,7 @@
 - [x] Editable word list management
 - [x] AI-powered image generation for custom words
 - [x] Export progress data to CSV
+- [x] Child-safe navigation lock with math verification
 
 ### Technical Infrastructure
 - [x] PWA setup with offline capability
