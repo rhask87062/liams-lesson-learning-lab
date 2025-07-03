@@ -116,13 +116,14 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         .animate-gentle-rock {
           animation: gentle-rock 9s ease-in-out infinite;
         }
+        // Animation for the Satellite asset on the Spelling Menu app
         @keyframes satellite-pass {
           0% {
-            transform: translateX(-10vw) translateY(20vh) rotate(0deg);
+            transform: translateX(-10vw) translateY(20vh) rotate(-15deg);
             opacity: 1;
           }
           100% {
-            transform: translateX(110vw) translateY(20vh) rotate(360deg);
+            transform: translateX(110vw) translateY(20vh) rotate(345deg);
             opacity: 1;
           }
         }
@@ -130,25 +131,49 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           animation: satellite-pass 50s linear infinite;
           animation-fill-mode: backwards;
         }
+        // Animation for the Meteor asset on the Spelling Menu app
+        @keyframes fly-by {
+          0% {
+            transform: translate(-10vw, 100vh) scale(1) rotate(-50deg);
+            opacity: 0;
+          }
+          30% {
+            transform: translate(20vw, 70vh) scale(1) rotate(-50deg);
+            opacity: 1;
+          }
+          70% {
+            transform: translate(55vw, 45vh) scale(1) rotate(-50deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(120vw, 10vh) scale(0.6) rotate(-50deg);
+            opacity: 0;
+          }
+        }
+        .animate-fly-by {
+          animation: fly-by 15s linear infinite;
+          animation-fill-mode: backwards;
+        }
+        // Animation for the Rocket asset on the Spelling Menu app
         @keyframes rocket-fly-by {
             0% {
-                transform: translate(-10vw, 120vh) scale(0.6) rotate(0deg);
+                transform: translate(-10vw, 120vh) scale(0.6) rotate(50deg);
                 opacity: 0;
             }
             25% {
-                transform: translate(20vw, 70vh) scale(1) rotate(5deg);
+                transform: translate(20vw, 70vh) scale(1) rotate(40deg);
                 opacity: 1;
             }
             50% {
-                transform: translate(55vw, 45vh) scale(1) rotate(10deg);
+                transform: translate(55vw, 45vh) scale(1) rotate(40deg);
                 opacity: 1;
             }
             75% {
-                transform: translate(90vw, 25vh) scale(1) rotate(15deg);
+                transform: translate(90vw, 25vh) scale(1) rotate(40deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(120vw, 10vh) scale(0.6) rotate(20deg);
+                transform: translate(120vw, 10vh) scale(0.6) rotate(40deg);
                 opacity: 0;
             }
         }
