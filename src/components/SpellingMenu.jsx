@@ -131,7 +131,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={rocket} 
             alt="Rocket" 
-            className="absolute top-10 left-10 w-12 h-12 md:w-16 md:h-16 animate-fly-by" 
+            className="absolute top-10 left-40 w-12 h-12 md:w-16 md:h-16 animate-fly-by" 
           />
           <img 
             src={ufo} 
