@@ -142,7 +142,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             opacity: 1;
           }
           70% {
-            transform: translate(55vw, 45vh) scale(1) rotate(-50deg);
+            transform: translate(45vw, 45vh) scale(1) rotate(-50deg);
             opacity: 1;
           }
           100% {
@@ -157,24 +157,24 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         // Animation for the Rocket asset on the Spelling Menu app
         @keyframes rocket-fly-by {
             0% {
-                transform: translate(-10vw, 120vh) scale(0.6) rotate(35deg);
-                opacity: 0;
+                transform: translate(-10vw, 120vh) scale(0.6) rotate(40deg);
+                opacity: 1;
             }
             25% {
-                transform: translate(20vw, 70vh) scale(1) rotate(35deg);
+                transform: translate(32.5vw, 92.5vh) scale(1) rotate(40deg);
                 opacity: 1;
             }
             50% {
-                transform: translate(55vw, 45vh) scale(1) rotate(35deg);
+                transform: translate(75vw, 65vh) scale(1) rotate(40deg);
                 opacity: 1;
             }
             75% {
-                transform: translate(90vw, 25vh) scale(1) rotate(35deg);
+                transform: translate(117.5vw, 37.5vh) scale(1) rotate(40deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(120vw, 10vh) scale(0.6) rotate(35deg);
-                opacity: 0;
+                transform: translate(160vw, 10vh) scale(0.6) rotate(40deg);
+                opacity: 1;
             }
         }
         .animate-rocket-fly-by {
@@ -244,7 +244,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             animation: ufo-hover 15s ease-in-out infinite;
         }
         .celestial-glow {
-          filter: drop-shadow(0 0 6px rgba(255, 255, 224, 0.8));
+          filter: drop-shadow(0 0 6px rgba(245, 245, 224, 0.8));
         }
       `}</style>
             <div
