@@ -35,28 +35,28 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
       id: 'learn',
       title: 'Learn Mode',
       description: 'See and hear words',
-      color: 'from-blue-400 to-blue-600',
+      color: 'from-blue-900 to-blue-600',
       emoji: '📖'
     },
     {
       id: 'copy',
       title: 'Copy Mode', 
       description: 'Practice typing words',
-      color: 'from-purple-400 to-purple-600',
+      color: 'from-purple-900 to-purple-600',
       emoji: '✍️'
     },
     {
       id: 'fillblank',
       title: 'Fill Blanks',
       description: 'Complete missing letters',
-      color: 'from-yellow-400 to-orange-500',
+      color: 'from-yellow-900 to-orange-500',
       emoji: '🧩'
     },
     {
       id: 'test',
       title: 'Test Mode',
       description: 'Spell from picture only',
-      color: 'from-red-400 to-red-600',
+      color: 'from-red-900 to-red-600',
       emoji: '🏆'
     }
   ];
@@ -157,23 +157,23 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         // Animation for the Rocket asset on the Spelling Menu app
         @keyframes rocket-fly-by {
             0% {
-                transform: translate(-10vw, 120vh) scale(0.6) rotate(40deg);
+                transform: translate(-10vw, 120vh) scale(0.6) rotate(90deg);
                 opacity: 1;
             }
             25% {
-                transform: translate(32.5vw, 92.5vh) scale(1) rotate(40deg);
+                transform: translate(32.5vw, 92.5vh) scale(1) rotate(90deg);
                 opacity: 1;
             }
             50% {
-                transform: translate(75vw, 65vh) scale(1) rotate(40deg);
+                transform: translate(75vw, 65vh) scale(1) rotate(90deg);
                 opacity: 1;
             }
             75% {
-                transform: translate(117.5vw, 37.5vh) scale(1) rotate(40deg);
+                transform: translate(117.5vw, 37.5vh) scale(1) rotate(90deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(160vw, 10vh) scale(0.6) rotate(40deg);
+                transform: translate(160vw, 10vh) scale(0.6) rotate(90deg);
                 opacity: 1;
             }
         }
@@ -214,7 +214,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             transform: translate(0px, 10px) rotate(0deg);
             filter: drop-shadow(0 0 15px hsl(60, 100%, 50%));
           }
-          40% { /* Darting action */
+          90% { /* Darting action */
             transform: translate(50px, -30px) rotate(15deg);
           }
           50% {
@@ -229,11 +229,11 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             filter: drop-shadow(0 0 15px hsl(180, 100%, 50%));
           }
           80% { /* Darting action */
-            transform: translate(-40px, 30px) rotate(-15deg);
+            transform: translate(-90px, 30px) rotate(-15deg);
           }
           90% {
             transform: translate(0px, -5px) rotate(5deg);
-            filter: drop-shadow(0 0 10px hsl(240, 100%, 50%));
+            filter: drop-shadow(0 0 10px hsl(290, 100%, 50%));
           }
           100% {
             transform: translate(0, 0) rotate(0deg);
@@ -285,7 +285,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={rocket} 
             alt="Rocket" 
-            className={`absolute top-10 left-40 w-12 h-12 md:w-16 md:h-16 opacity-0 z-[8] ${animateItems.rocket ? 'animate-rocket-fly-by' : ''}`}
+            className={`absolute top-10 left-90 w-12 h-12 md:w-16 md:h-16 opacity-0 z-[8] ${animateItems.rocket ? 'animate-rocket-fly-by' : ''}`}
           />
         </div>
         {/* Home button - top right */}
@@ -314,7 +314,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             <Button
               key={mode.id}
               onClick={() => onSelectMode(mode.id)}
-              className={`relative h-40 md:h-48 p-6 md:p-8 bg-gradient-to-br ${mode.color} hover:scale-105 transform transition-all duration-300 shadow-xl hover:shadow-2xl rounded-3xl border-0 text-white group overflow-hidden`}
+              className={`relative h-90 md:h-48 p-6 md:p-8 bg-gradient-to-br ${mode.color} hover:scale-105 transform transition-all duration-300 shadow-xl hover:shadow-2xl rounded-3xl border-0 text-white group overflow-hidden`}
               tabIndex={index + 1}
             >
               {/* Background decoration */}
