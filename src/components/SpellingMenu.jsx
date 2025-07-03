@@ -204,7 +204,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         @keyframes ufo-hover {
           0% {
             transform: translate(0, 0) rotate(0deg);
-            filter: drop-shadow(0 0 10px hsl(0, 100%, 50%));
+            filter: drop-shadow(0px 0px 8px hsl(0, 100%, 70%)); /* Adjusted shadow for edge glow */
           }
           10% {
             transform: translate(5px, -10px) rotate(5deg);
@@ -214,32 +214,32 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           }
           30% {
             transform: translate(0px, 10px) rotate(0deg);
-            filter: drop-shadow(0 0 15px hsl(60, 100%, 50%));
+            filter: drop-shadow(0px 0px 12px hsl(60, 100%, 70%)); /* Adjusted shadow for edge glow */
           }
-          90% { /* Darting action */
+          40% { /* Darting action */
             transform: translate(50px, -30px) rotate(15deg);
           }
           50% {
             transform: translate(20px, 20px) rotate(-10deg);
-            filter: drop-shadow(0 0 10px hsl(120, 100%, 50%));
+            filter: drop-shadow(0px 0px 8px hsl(120, 100%, 70%)); /* Adjusted shadow for edge glow */
           }
           60% {
             transform: translate(-20px, -20px) rotate(10deg);
           }
           70% {
             transform: translate(10px, 0px) rotate(-5deg);
-            filter: drop-shadow(0 0 15px hsl(180, 100%, 50%));
+            filter: drop-shadow(0px 0px 12px hsl(180, 100%, 70%)); /* Adjusted shadow for edge glow */
           }
           80% { /* Darting action */
             transform: translate(-90px, 30px) rotate(-15deg);
           }
           90% {
             transform: translate(0px, -5px) rotate(5deg);
-            filter: drop-shadow(0 0 10px hsl(290, 100%, 50%));
+            filter: drop-shadow(0px 0px 8px hsl(290, 100%, 70%)); /* Adjusted shadow for edge glow */
           }
           100% {
             transform: translate(0, 0) rotate(0deg);
-            filter: drop-shadow(0 0 10px hsl(300, 100%, 50%));
+            filter: drop-shadow(0px 0px 10px hsl(300, 100%, 70%)); /* Adjusted shadow for edge glow */
           }
         }
         .animate-ufo-hover {

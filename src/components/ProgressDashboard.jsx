@@ -51,12 +51,6 @@ export function ProgressDashboard({
       from: addDays(new Date(), -7),
       to: new Date(),
     });
-    const [newWord, setNewWord] = useState('');
-    const [newWordImage, setNewWordImage] = useState('');
-    const [editingWordIndex, setEditingWordIndex] = useState(null);
-    const [editingWord, setEditingWord] = useState({ word: '', image: '' });
-    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-    const [isCategorizing, setIsCategorizing] = useState(false);
 
     // Filter data based on date range
     const filteredData = useMemo(() => {
