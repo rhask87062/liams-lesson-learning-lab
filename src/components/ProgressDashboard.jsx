@@ -162,6 +162,10 @@ const DashboardContent = ({
     const saved = localStorage.getItem('customWordList');
     return saved ? JSON.parse(saved) : getAllWords();
   });
+  const [newWord, setNewWord] = useState('');
+  const [newWordImage, setNewWordImage] = useState('');
+  const [editingWordIndex, setEditingWordIndex] = useState(null);
+  const [editingWord, setEditingWord] = useState({ word: '', image: '' });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
 
