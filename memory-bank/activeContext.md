@@ -334,26 +334,18 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
   - Prevents items from going outside the petri dish viewing area
 
 ## Session 17: LetterLearner Home Button Update
-- **Issue**: Home button styling inconsistent with MatchingGame
+- **Issue**: Home button in LetterLearner positioned in wrong corner (top-left instead of top-right)
 - **Solution**:
-  - Moved home button from bottom-right to top-right
-  - Applied same glassmorphic styling (bg-white/10 backdrop-blur-md)
-  - Modified alphabet grid to have empty top-right position, shifting all letters appropriately
-  - All 26 letters remain, with I moved to start of row 2
-  - Separated lock button to remain at bottom-right
-  - Consistent UI across all game modes
+  - Moved home button container from top-4 left-4 to top-4 right-4
+  - Maintains consistency with other app layouts
 
-## Session 18: Global Home Button Standardization
-- **Issue**: Home buttons inconsistent across entire app
-- **Solution**: Updated all components to use same position (top-right) and glassmorphic style
-  - SpellingMenu: Moved from bottom-right, separated cow animation
-  - LearnMode: Moved from bottom-right, separated lock button
-  - CopyMode: Moved from bottom-right, separated lock button
-  - FillBlankMode: Moved from bottom-right, separated lock button
-  - TestMode: Moved from bottom-right, separated lock button
-  - MagicPaint: Moved from top-left, shifted effects menu to left
-  - ProgressDashboard: Updated styling to match glassmorphic theme
-  - All buttons now: top-4 right-4, bg-white/10 backdrop-blur-md hover:bg-white/20
+## Session 18: Fix Navigation Lock Behavior
+- **Issue**: Navigation lock was preventing all game interactions, not just navigation
+- **Root Cause**: LetterLearner's handleLetterSelect was checking isNavigationLocked and returning early
+- **Solution**: 
+  - Removed isNavigationLocked check from handleLetterSelect
+  - Now lock only prevents navigation (home button, escape key) while allowing game play
+  - This ensures children can't accidentally exit the app but can still interact with the educational content
 
 ## Session 19: Progress Dashboard Position Fix & Math Lock Implementation
 - **Issue**: Progress Dashboard home button not in absolute top-right, text not visible
@@ -385,3 +377,15 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
   - 20-second animation cycle with smooth transitions
   - Positioned at bottom-16 right-16 for better corner drifting
   - Spiral movement with rotation for more natural floating effect 
+
+### Session 19: SpellingMenu Animation Enhancements
+- **Task**: Improve the animations in the SpellingMenu for a more dynamic and immersive experience.
+- **UFO Animation**:
+  - Moved the UFO to the top-right corner.
+  - Created a new `ufo-hover` animation with random darting, wobbling, and a pulsating rainbow `drop-shadow` for a glow effect.
+- **Rocket & Satellite Animation**:
+  - **Issue**: Rocket and satellite would appear statically on screen before their animations started.
+  - **Solution**:
+    - Ensured they start off-screen and invisible by setting their initial `opacity` to 0.
+    - Implemented a `useEffect` hook to apply the animation classes with a randomized delay, making their appearances surprising and preventing them from appearing at fixed intervals.
+    - Consolidated the `rocket-fly-by` animation into `SpellingMenu.jsx` to make the component more self-contained. 

@@ -161,7 +161,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
   }, [wordList]);
 
   const handleLetterSelect = useCallback((letter) => {
-    if (isNavigationLocked || isAnimating) return;
+    if (isAnimating) return;
 
     const words = wordsByLetter[letter];
     if (words && words.length > 0) {
@@ -179,7 +179,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
         setActiveKey(null); // Remove highlight
       }, 4500);
     }
-  }, [wordsByLetter, isNavigationLocked, isAnimating]);
+  }, [wordsByLetter, isAnimating]);
 
   // Keyboard navigation
   useEffect(() => {

@@ -9,6 +9,26 @@ import cow from '../assets/spelling-menu/cow.png';
 import rocket from '../assets/spelling-menu/rocket.png';
 
 const SpellingMenu = ({ onSelectMode, onHome }) => {
+  const [animateItems, setAnimateItems] = useState({
+    satellite: false,
+    rocket: false,
+  });
+
+  useEffect(() => {
+    const satelliteTimer = setTimeout(() => {
+      setAnimateItems(prev => ({ ...prev, satellite: true }));
+    }, Math.random() * 5000 + 1000); // Random delay 1-6s
+
+    const rocketTimer = setTimeout(() => {
+      setAnimateItems(prev => ({ ...prev, rocket: true }));
+    }, Math.random() * 8000 + 2000); // Random delay 2-10s
+
+    return () => {
+      clearTimeout(satelliteTimer);
+      clearTimeout(rocketTimer);
+    };
+  }, []);
+
   const modes = [
     {
       id: 'learn',
@@ -98,15 +118,42 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         @keyframes satellite-pass {
           0% {
             transform: translateX(-10vw) translateY(20vh) rotate(0deg);
+            opacity: 1;
           }
           100% {
             transform: translateX(110vw) translateY(20vh) rotate(360deg);
+            opacity: 1;
           }
         }
         .animate-satellite-pass {
           animation: satellite-pass 50s linear infinite;
-          animation-delay: 3s;
           animation-fill-mode: backwards;
+        }
+        @keyframes rocket-fly-by {
+            0% {
+                transform: translate(-10vw, 120vh) scale(0.6) rotate(0deg);
+                opacity: 0;
+            }
+            25% {
+                transform: translate(20vw, 70vh) scale(1) rotate(5deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(55vw, 45vh) scale(1) rotate(10deg);
+                opacity: 1;
+            }
+            75% {
+                transform: translate(90vw, 25vh) scale(1) rotate(15deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(120vw, 10vh) scale(0.6) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        .animate-rocket-fly-by {
+            animation: rocket-fly-by 15s linear infinite;
+            animation-fill-mode: backwards;
         }
         @keyframes gentle-bounce {
           0%, 100% {
@@ -125,6 +172,50 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         .animate-gentle-bounce {
           animation: gentle-bounce 6s ease-in-out infinite;
           animation-delay: 1s;
+        }
+        @keyframes ufo-hover {
+          0% {
+            transform: translate(0, 0) rotate(0deg);
+            filter: drop-shadow(0 0 10px hsl(0, 100%, 50%));
+          }
+          10% {
+            transform: translate(5px, -10px) rotate(5deg);
+          }
+          20% {
+            transform: translate(-10px, 0px) rotate(-5deg);
+          }
+          30% {
+            transform: translate(0px, 10px) rotate(0deg);
+            filter: drop-shadow(0 0 15px hsl(60, 100%, 50%));
+          }
+          40% { /* Darting action */
+            transform: translate(50px, -30px) rotate(15deg);
+          }
+          50% {
+            transform: translate(20px, 20px) rotate(-10deg);
+            filter: drop-shadow(0 0 10px hsl(120, 100%, 50%));
+          }
+          60% {
+            transform: translate(-20px, -20px) rotate(10deg);
+          }
+          70% {
+            transform: translate(10px, 0px) rotate(-5deg);
+            filter: drop-shadow(0 0 15px hsl(180, 100%, 50%));
+          }
+          80% { /* Darting action */
+            transform: translate(-40px, 30px) rotate(-15deg);
+          }
+          90% {
+            transform: translate(0px, -5px) rotate(5deg);
+            filter: drop-shadow(0 0 10px hsl(240, 100%, 50%));
+          }
+          100% {
+            transform: translate(0, 0) rotate(0deg);
+            filter: drop-shadow(0 0 10px hsl(300, 100%, 50%));
+          }
+        }
+        .animate-ufo-hover {
+            animation: ufo-hover 15s ease-in-out infinite;
         }
         .celestial-glow {
           filter: drop-shadow(0 0 6px rgba(255, 255, 224, 0.8));
@@ -153,18 +244,18 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             alt="Meteor" 
             className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by z-[5]" 
           />
-          <div className="absolute text-5xl animate-satellite-pass z-[6]">🛰️</div>
+          <div className={`absolute text-5xl z-[6] opacity-0 ${animateItems.satellite ? 'animate-satellite-pass' : ''}`}>🛰️</div>
           
           {/* Foreground objects */}
           <img 
             src={ufo} 
             alt="UFO" 
-            className="absolute bottom-10 right-12 w-12 h-12 md:w-16 md:h-16 animate-gentle-bounce z-[7]" 
+            className="absolute top-12 right-16 w-12 h-12 md:w-16 md:h-16 animate-ufo-hover z-[7]" 
           />
           <img 
             src={rocket} 
             alt="Rocket" 
-            className="absolute top-10 left-40 w-12 h-12 md:w-16 md:h-16 animate-fly-by z-[8]" 
+            className={`absolute top-10 left-40 w-12 h-12 md:w-16 md:h-16 opacity-0 z-[8] ${animateItems.rocket ? 'animate-rocket-fly-by' : ''}`}
           />
         </div>
         {/* Home button - top right */}
