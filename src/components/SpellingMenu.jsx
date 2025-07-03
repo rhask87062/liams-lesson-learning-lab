@@ -13,6 +13,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
   const [animateItems, setAnimateItems] = useState({
     satellite: false,
     rocket: false,
+    meteor: false,
   });
 
   useEffect(() => {
@@ -24,9 +25,14 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
       setAnimateItems(prev => ({ ...prev, rocket: true }));
     }, Math.random() * 8000 + 2000); // Random delay 2-10s
 
+    const meteorTimer = setTimeout(() => {
+      setAnimateItems(prev => ({ ...prev, meteor: true }));
+    }, Math.random() * 7000 + 1500); // Random delay 1.5-8.5s
+
     return () => {
       clearTimeout(satelliteTimer);
       clearTimeout(rocketTimer);
+      clearTimeout(meteorTimer);
     };
   }, []);
 
@@ -119,12 +125,12 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         // Animation for the Satellite asset on the Spelling Menu app
         @keyframes satellite-pass {
           0% {
-            transform: translateX(-10vw) translateY(20vh) rotate(-15deg);
-            opacity: 1;
+            transform: translate(-50vw, 20vh) rotate(-15deg);
+            opacity: 0;
           }
           100% {
-            transform: translateX(110vw) translateY(20vh) rotate(345deg);
-            opacity: 1;
+            transform: translate(150vw, 20vh) rotate(345deg);
+            opacity: 0;
           }
         }
         .animate-satellite-pass {
@@ -134,51 +140,47 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         // Animation for the Meteor asset on the Spelling Menu app
         @keyframes fly-by {
           0% {
-            transform: translate(-10vw, 100vh) scale(1) rotate(-50deg);
+            transform: translate(-150vw, 150vh) scale(0.6) rotate(-45deg);
             opacity: 0;
           }
-          30% {
-            transform: translate(20vw, 70vh) scale(1) rotate(-50deg);
+          25% {
+            transform: translate(0vw, 100vh) scale(1) rotate(-45deg);
             opacity: 1;
           }
-          70% {
-            transform: translate(45vw, 45vh) scale(1) rotate(-50deg);
+          75% {
+            transform: translate(100vw, -0vh) scale(1) rotate(-45deg);
             opacity: 1;
           }
           100% {
-            transform: translate(120vw, 10vh) scale(0.6) rotate(-50deg);
+            transform: translate(250vw, -50vh) scale(0.6) rotate(-45deg);
             opacity: 0;
           }
         }
         .animate-fly-by {
-          animation: fly-by 15s linear infinite;
+          animation: fly-by 20s linear infinite;
           animation-fill-mode: backwards;
         }
         // Animation for the Rocket asset on the Spelling Menu app
         @keyframes rocket-fly-by {
             0% {
-                transform: translate(-10vw, 120vh) scale(0.6) rotate(90deg);
-                opacity: 1;
+                transform: translate(-50vw, 150vh) scale(0.6) rotate(45deg);
+                opacity: 0;
             }
             25% {
-                transform: translate(32.5vw, 92.5vh) scale(1) rotate(90deg);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(75vw, 65vh) scale(1) rotate(90deg);
+                transform: translate(0vw, 100vh) scale(1) rotate(45deg);
                 opacity: 1;
             }
             75% {
-                transform: translate(117.5vw, 37.5vh) scale(1) rotate(90deg);
+                transform: translate(100vw, 0vh) scale(1) rotate(45deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(160vw, 10vh) scale(0.6) rotate(90deg);
-                opacity: 1;
+                transform: translate(150vw, -50vh) scale(0.6) rotate(45deg);
+                opacity: 0;
             }
         }
         .animate-rocket-fly-by {
-            animation: rocket-fly-by 15s linear infinite;
+            animation: rocket-fly-by 20s linear infinite;
             animation-fill-mode: backwards;
         }
         @keyframes gentle-bounce {
@@ -268,12 +270,12 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={meteor} 
             alt="Meteor" 
-            className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by z-[5]" 
+            className={`absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 z-[5] opacity-0 ${animateItems.meteor ? 'animate-fly-by' : ''}`}
           />
           <img 
             src={satellite} 
             alt="Satellite" 
-            className={`absolute top-1/5 left-1/2 w-10 h-10 md:w-12 md:h-12 z-[6] opacity-0 ${animateItems.satellite ? 'animate-satellite-pass' : ''}`} // Use img tag
+            className={`absolute top-1/5 left-1/2 w-10 h-10 md:w-12 md:h-12 z-[6] opacity-0 ${animateItems.satellite ? 'animate-satellite-pass' : ''}`}
           />
           
           {/* Foreground objects */}
