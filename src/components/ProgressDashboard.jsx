@@ -25,6 +25,7 @@ import { useTherapistAuth } from '@/hooks/useTherapistAuth.js';
 import Login from '@/components/Login.jsx';
 import { addDays, format } from "date-fns";
 import { getAllWords, unifiedWordDatabase } from '../lib/unifiedWordDatabase';
+import { generateImage, categorizeWord } from '../services/OpenAI_API.js';
 
 export function ProgressDashboard({ 
   progressData, 
@@ -50,6 +51,12 @@ export function ProgressDashboard({
       from: addDays(new Date(), -7),
       to: new Date(),
     });
+    const [newWord, setNewWord] = useState('');
+    const [newWordImage, setNewWordImage] = useState('');
+    const [editingWordIndex, setEditingWordIndex] = useState(null);
+    const [editingWord, setEditingWord] = useState({ word: '', image: '' });
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+    const [isCategorizing, setIsCategorizing] = useState(false);
 
     // Filter data based on date range
     const filteredData = useMemo(() => {
@@ -161,11 +168,8 @@ const DashboardContent = ({
     const saved = localStorage.getItem('customWordList');
     return saved ? JSON.parse(saved) : getAllWords();
   });
-  const [newWord, setNewWord] = useState('');
-  const [newWordImage, setNewWordImage] = useState('');
-  const [editingWordIndex, setEditingWordIndex] = useState(null);
-  const [editingWord, setEditingWord] = useState({ word: '', image: '' });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isCategorizing, setIsCategorizing] = useState(false);
 
   // Load therapist notes
   useEffect(() => {
@@ -308,21 +312,15 @@ const DashboardContent = ({
 
   // Word list management functions
   const handleAddWord = async () => {
-    if (newWord.trim() && !isGeneratingImage) {
+    if (newWord.trim() && !isGeneratingImage && !isCategorizing) {
       let imageToUse = newWordImage || '❓';
+      let categoryToUse = 'custom';
       
       // If no custom image provided, generate one using OpenAI
       if (!newWordImage) {
         try {
           setIsGeneratingImage(true);
-          
-          // Import the generateImage function
-          const { generateImage } = await import('../services/OpenAI_API.js');
-          
-          // Generate the image
           const imageUrl = await generateImage(newWord.trim());
-          
-          // Convert to base64 for storage
           const response = await fetch(imageUrl);
           const blob = await response.blob();
           const reader = new FileReader();
@@ -335,27 +333,39 @@ const DashboardContent = ({
           
         } catch (error) {
           console.error('Failed to generate image:', error);
-          // Fall back to emoji if generation fails
           imageToUse = '❓';
-          alert('Failed to generate image. Please check your OpenAI API key. The word will be added with a placeholder.');
+          alert('Failed to generate image. Please check your OpenAI API key or billing. The word will be added with a placeholder.');
         } finally {
           setIsGeneratingImage(false);
         }
+      }
+
+      // Automatically categorize the word
+      try {
+        setIsCategorizing(true);
+        categoryToUse = await categorizeWord(newWord.trim());
+      } catch (error) {
+        console.error('Failed to categorize word:', error);
+        // Fallback to 'custom' category, already initialized
+      } finally {
+        setIsCategorizing(false);
       }
       
       const newWordObj = {
         id: Date.now(),
         word: newWord.trim().toLowerCase(),
         image: imageToUse,
-        category: 'custom',
+        category: categoryToUse,
         pronunciation: `/${newWord.trim().toLowerCase()}/`
       };
       const updatedList = [...customWordList, newWordObj];
+      // Sort the list alphabetically
+      updatedList.sort((a, b) => a.word.localeCompare(b.word));
+
       setCustomWordList(updatedList);
       localStorage.setItem('customWordList', JSON.stringify(updatedList));
       setNewWord('');
       setNewWordImage('');
-      // Dispatch event so other components can update
       window.dispatchEvent(new Event('wordListChanged'));
     }
   };
@@ -384,6 +394,8 @@ const DashboardContent = ({
         image: editingWord.image || '❓',
         pronunciation: `/${editingWord.word.trim().toLowerCase()}/`
       };
+      // Ensure edited list is sorted alphabetically
+      updatedList.sort((a, b) => a.word.localeCompare(b.word));
       setCustomWordList(updatedList);
       localStorage.setItem('customWordList', JSON.stringify(updatedList));
       setEditingWordIndex(null);
@@ -395,6 +407,8 @@ const DashboardContent = ({
   const handleResetWordList = () => {
     if (window.confirm('Are you sure you want to reset to the default word list? This will remove all custom words.')) {
       const defaultList = getAllWords();
+      // Ensure default list is sorted on load
+      defaultList.sort((a, b) => a.word.localeCompare(b.word));
       setCustomWordList(defaultList);
       localStorage.setItem('customWordList', JSON.stringify(defaultList));
       window.dispatchEvent(new Event('wordListChanged'));
@@ -684,16 +698,11 @@ const DashboardContent = ({
                         className="w-32"
                       />
                       <Button 
-                        onClick={handleAddWord} 
-                        size="sm" 
+                        onClick={handleAddWord}
+                        disabled={!newWord.trim() || isGeneratingImage || isCategorizing}
                         className="bg-blue-500 hover:bg-blue-600"
-                        disabled={isGeneratingImage || !newWord.trim()}
                       >
-                        {isGeneratingImage ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Plus className="h-4 w-4" />
-                                                  )}
+                        {isGeneratingImage || isCategorizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                       </Button>
                       </div>
                     </div>

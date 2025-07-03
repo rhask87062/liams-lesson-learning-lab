@@ -22,11 +22,15 @@ export const unifiedWordDatabase = {
   ],
   E: [
     { word: 'elephant', image: '🐘', category: 'animals' },
-    { word: 'egg', image: '🥚', category: 'food' }
+    { word: 'egg', image: '��', category: 'food' },
+    { word: 'eleven', image: '1️⃣1️⃣', category: 'numbers' },
+    { word: 'eighteen', image: '1️⃣8️⃣', category: 'numbers' }
   ],
   F: [
     { word: 'fish', image: '🐟', category: 'animals' },
-    { word: 'frog', image: '🐸', category: 'animals' }
+    { word: 'frog', image: '🐸', category: 'animals' },
+    { word: 'fourteen', image: '1️⃣4️⃣', category: 'numbers' },
+    { word: 'fifteen', image: '1️⃣5️⃣', category: 'numbers' }
   ],
   G: [
     { word: 'giraffe', image: '🦒', category: 'animals' },
@@ -58,7 +62,8 @@ export const unifiedWordDatabase = {
   ],
   N: [
     { word: 'nest', image: '🪺', category: 'nature' },
-    { word: 'nose', image: '👃', category: 'body' }
+    { word: 'nose', image: '��', category: 'body' },
+    { word: 'nineteen', image: '1️⃣9️⃣', category: 'numbers' }
   ],
   O: [
     { word: 'orange', image: '🍊', category: 'food' },
@@ -78,11 +83,16 @@ export const unifiedWordDatabase = {
   ],
   S: [
     { word: 'sun', image: '☀️', category: 'nature' },
-    { word: 'snake', image: '🐍', category: 'animals' }
+    { word: 'snake', image: '🐍', category: 'animals' },
+    { word: 'sixteen', image: '1️⃣6️⃣', category: 'numbers' },
+    { word: 'seventeen', image: '1️⃣7️⃣', category: 'numbers' }
   ],
   T: [
     { word: 'tree', image: '🌳', category: 'nature' },
-    { word: 'tiger', image: '🐅', category: 'animals' }
+    { word: 'tiger', image: '🐅', category: 'animals' },
+    { word: 'twelve', image: '1️⃣2️⃣', category: 'numbers' },
+    { word: 'thirteen', image: '1️⃣3️⃣', category: 'numbers' },
+    { word: 'twenty', image: '2️⃣0️⃣', category: 'numbers' }
   ],
   U: [
     { word: 'umbrella', image: '☂️', category: 'objects' },

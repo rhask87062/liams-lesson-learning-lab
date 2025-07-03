@@ -185,3 +185,22 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
     - Ensured they start off-screen and invisible by setting their initial `opacity` to 0.
     - Implemented a `useEffect` hook to apply the animation classes with a randomized delay, making their appearances surprising and preventing them from appearing at fixed intervals.
     - Consolidated the `rocket-fly-by` animation into `SpellingMenu.jsx` to make the component more self-contained. 
+
+### Session 20: OpenAI API Integration Refinement & Word List Enhancements
+- **Task**: Address persistent OpenAI image generation errors and implement word list improvements.
+- **OpenAI API `BadRequest: 400` Debugging**: 
+  - **Issue**: Previously received "Unknown parameter: 'response_format'" and "Billing hard limit has been reached" errors from OpenAI.
+  - **Solution**: Confirmed with OpenAI documentation that `gpt-image-1` model does not use `response_format` or `style` parameters. Corrected `src/services/OpenAI_API.js` to:
+    - Change model to `"gpt-image-1"`.
+    - Remove `response_format` and `style` parameters.
+    - Set `quality` to `'auto'`.
+  - **Note**: The "Billing hard limit" error is an account-specific issue on OpenAI's side, requiring direct resolution by the user (checking billing, usage tiers, or contacting OpenAI support).
+- **Automatic Word Categorization**:
+  - **Feature**: Added a `categorizeWord` function to `src/services/OpenAI_API.js` using `gpt-3.5-turbo` to automatically assign categories (animals, food, objects, nature, people, places, vehicles, clothes, music, fantasy, custom) to new words added to the list.
+  - **Integration**: Modified `handleAddWord` in `src/components/ProgressDashboard.jsx` to call `categorizeWord` if no manual category is provided, incorporating loading states (`isCategorizing`) and error handling.
+- **Alphabetical Word List Sorting**:
+  - **Feature**: Ensured the word list is always displayed in alphabetical order.
+  - **Implementation**: Added sorting logic (`.sort((a, b) => a.word.localeCompare(b.word))`) to `handleAddWord`, `handleSaveEdit`, and `handleResetWordList` in `src/components/ProgressDashboard.jsx`.
+- **Extended Number Word List (11-20)**:
+  - **Feature**: Expanded the default word database to include numbers 11 through 20 as word entries.
+  - **Implementation**: Added entries like "eleven", "twelve", etc., to their respective alphabetical sections (`E`, `T`, etc.) in `src/lib/unifiedWordDatabase.js`, assigning them 'numbers' category and relevant emojis.
