@@ -276,16 +276,16 @@ input, textarea {
 
 @keyframes fly-by {
   0% {
-    transform: translate(100vw, 100vh) scale(1) rotate(-50deg);
+    transform: translate(100vw, 100vh) scale(1) rotate(90deg);
   }
   30% {
-    transform: translate(80vw, 80vh) scale(1) rotate(-50deg);
+    transform: translate(80vw, 80vh) scale(1) rotate(90deg);
   }
   70% {
-    transform: translate(40vw, 40vh) scale(1) rotate(-50deg);
+    transform: translate(40vw, 40vh) scale(1) rotate(90deg);
   }
   100% {
-    transform: translate(0vw, 0vh) scale(1) rotate(-50deg);
+    transform: translate(0vw, 0vh) scale(1) rotate(90deg);
   }
 }
 

@@ -750,7 +750,7 @@ const DashboardContent = ({
                                     className="w-16"
                                   />
                                 ) : (
-                                  wordObj.image.startsWith('data:image') ? (
+                                  wordObj.image.startsWith('data:image') || wordObj.image.startsWith('/') ? (
                                     <img 
                                       src={wordObj.image} 
                                       alt={wordObj.word}

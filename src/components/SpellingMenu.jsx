@@ -7,6 +7,7 @@ import meteor from '../assets/spelling-menu/meteor.png';
 import ufo from '../assets/spelling-menu/ufo.png';
 import cow from '../assets/spelling-menu/cow.png';
 import rocket from '../assets/spelling-menu/rocket.png';
+import satellite from '../assets/satellite.png'; // Import satellite.png
 
 const SpellingMenu = ({ onSelectMode, onHome }) => {
   const [animateItems, setAnimateItems] = useState({
@@ -244,7 +245,11 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             alt="Meteor" 
             className="absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 animate-fly-by z-[5]" 
           />
-          <div className={`absolute text-5xl z-[6] opacity-0 ${animateItems.satellite ? 'animate-satellite-pass' : ''}`}>🛰️</div>
+          <img 
+            src={satellite} 
+            alt="Satellite" 
+            className={`absolute top-1/5 left-1/2 w-10 h-10 md:w-12 md:h-12 z-[6] opacity-0 ${animateItems.satellite ? 'animate-satellite-pass' : ''}`} // Use img tag
+          />
           
           {/* Foreground objects */}
           <img 

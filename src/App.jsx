@@ -128,23 +128,23 @@ function App() {
 
       @keyframes rocket-fly-by {
         0% {
-          transform: translate(-10vw, 120vh) scale(0.6) rotate(0deg);
+          transform: translate(-10vw, 120vh) scale(0.6) rotate(80deg);
           opacity: 0;
         }
         25% {
-          transform: translate(20vw, 70vh) scale(1) rotate(5deg);
+          transform: translate(20vw, 70vh) scale(1) rotate(80deg);
           opacity: 1;
         }
         50% {
-          transform: translate(55vw, 45vh) scale(1) rotate(10deg);
+          transform: translate(55vw, 45vh) scale(1) rotate(80deg);
           opacity: 1;
         }
         75% {
-          transform: translate(90vw, 25vh) scale(1) rotate(15deg);
+          transform: translate(90vw, 25vh) scale(1) rotate(80deg);
           opacity: 1;
         }
         100% {
-          transform: translate(120vw, 10vh) scale(0.6) rotate(20deg);
+          transform: translate(120vw, 10vh) scale(0.6) rotate(80deg);
           opacity: 0;
         }
       }
