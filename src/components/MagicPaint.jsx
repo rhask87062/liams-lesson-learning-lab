@@ -1091,7 +1091,7 @@ const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
       ) : (
         <canvas ref={canvasRef} className="w-full h-full" />
       )}
-      <div className="absolute top-4 right-4 flex flex-col space-y-2 z-50">
+      <div className="absolute top-4 left-4 flex flex-col space-y-2 z-50">
         {effects.map((effect) => (
           <Button
             key={effect.id}
@@ -1107,9 +1107,16 @@ const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
           </Button>
         ))}
       </div>
-      <Button onClick={onHome} className="absolute top-4 left-4 bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 z-50">
-        <Home className="h-5 w-5" />
-      </Button>
+      {/* Home button - top right */}
+      <div className="absolute top-4 right-4 z-50">
+        <Button
+          onClick={onHome}
+          className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+        >
+          <Home className="mr-2" size={20} />
+          Home
+        </Button>
+      </div>
     </div>
   );
 };

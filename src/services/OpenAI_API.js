@@ -12,15 +12,18 @@ export const generateImage = async (word) => {
     dangerouslyAllowBrowser: true // This is required for client-side API calls
   });
 
-  const prompt = `A simple, toddler-friendly cartoon illustration of ${word}. The background MUST be transparent.`;
+  // Use the specific prompt format requested
+  const prompt = `Please generate an image of a ${word.toLowerCase()}, in a cartoonish and colorful style appropriate for a toddler with a transparent background. In a very tight shot so that the images display large in my app.`;
 
   try {
     const response = await openai.images.generate({
-      model: "dall-e-3",
+      model: "dall-e-3", // Using DALL-E 3 as it's the latest model that supports transparency
       prompt: prompt,
       n: 1,
       size: "1024x1024",
       response_format: 'url',
+      quality: 'standard', // Can be 'standard' or 'hd'
+      style: 'vivid' // Can be 'vivid' or 'natural' - vivid is better for cartoonish style
     });
     
     if (response.data && response.data.length > 0) {

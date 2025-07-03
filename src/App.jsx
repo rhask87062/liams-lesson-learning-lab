@@ -29,7 +29,10 @@ function App() {
   const [showUnlockPrompt, setShowUnlockPrompt] = useState(false);
   const [showPWAInstallPrompt, setShowPWAInstallPrompt] = useState(false);
   const { createParentAccount } = useTherapistAuth();
-  const [wordList, setWordList] = useState(getAllWords());
+  const [wordList, setWordList] = useState(() => {
+    const saved = localStorage.getItem('customWordList');
+    return saved ? JSON.parse(saved) : getAllWords();
+  });
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [stars, setStars] = useState([]);
 
@@ -49,6 +52,17 @@ function App() {
     if (appElement) {
       appElement.focus();
     }
+
+    // Listen for word list changes
+    const handleWordListChange = () => {
+      const saved = localStorage.getItem('customWordList');
+      if (saved) {
+        setWordList(JSON.parse(saved));
+      }
+    };
+
+    window.addEventListener('wordListChanged', handleWordListChange);
+    return () => window.removeEventListener('wordListChanged', handleWordListChange);
   }, []);
 
   // Add global keyboard listener

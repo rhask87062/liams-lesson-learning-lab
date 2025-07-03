@@ -45,20 +45,24 @@ const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLo
         <div className="absolute bottom-1/3 left-1/4 text-3xl animate-bounce delay-200">🦑</div>
         <div className="absolute top-1/4 right-1/3 text-4xl animate-pulse delay-800">🏖️</div>
       </div>
-      {/* Header with home and lock buttons */}
-      <div className="absolute bottom-4 right-4 flex gap-2">
+      {/* Home button - top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <Button
+          onClick={onHome}
+          className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+        >
+          <Home className="mr-2" size={20} />
+          Home
+        </Button>
+      </div>
+
+      {/* Lock button - bottom right */}
+      <div className="absolute bottom-4 right-4 z-30">
         <Button
           onClick={onLock}
           className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-500 hover:bg-gray-600'} text-white rounded-lg`}
         >
           {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
-        </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
         </Button>
       </div>
 

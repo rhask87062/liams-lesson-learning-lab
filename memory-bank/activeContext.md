@@ -171,3 +171,186 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
 - **Solution**: Removed duplicate fly-by keyframes from App.jsx inline styles
 - **Result**: App.css animations now properly control rocket trajectory and rotation
 - **Lesson**: Inline styles have higher specificity than external stylesheets 
+
+## Session 3: Fixing Microscope Item Animation (continued)
+
+### User Feedback: Items moving too quickly and spiraling
+- Issue: Items were rotating and moving too fast, not realistic for liquid suspension
+- Solution implemented:
+  1. Removed rotation from float animation completely
+  2. Changed to gentle up/down movement with slight horizontal drift
+  3. Increased animation duration from 5-6s to 8-26s per cycle
+  4. Added varied radii (30-38%) for more organic positioning
+  5. Removed inline style jsx that was defining old animation
+- Result: Items now float gently like they're suspended in liquid 
+
+## Session 4: Word List Management in Curriculum Settings
+
+### User Request: Make word list editable from within curriculum settings
+- Added word list management functionality to Progress Dashboard's Curriculum Settings tab
+- Implementation details:
+  1. Added state management for custom word list in DashboardContent component
+  2. Created UI for adding, editing, and deleting words
+  3. Added word list table with inline editing capability
+  4. Included reset to default functionality
+  5. Integrated with localStorage for persistence
+  6. Added event system ('wordListChanged') to sync changes across components
+- Updated App.jsx to use custom word list from localStorage
+- Added event listener in App.jsx to respond to word list changes
+- Features:
+  - Add new words with custom emoji/image
+  - Edit existing words inline
+  - Delete individual words
+  - View total word count
+  - Reset to default word list
+  - Changes persist across sessions
+- Result: Teachers can now customize the word list directly from the Progress Dashboard without needing the separate Word List Manager 
+
+## Session 5: Differentiated Movement for Living Microbes
+
+### User Request: Living microbes with propulsion should move more quickly
+- Added movement type classification to all microscopic items:
+  - **Active** (4-6s): Amoeba, Paramecium, Euglena, White Blood Cell - have means of propulsion
+  - **Passive** (8-12s): Red Blood Cell, Virus, Mold Spore - no self-propulsion, drift slowly
+  - **Static** (12-18s): Diatom, Sodium Crystal, Pollen Grain - non-living particles
+- Created new CSS animation `float-active` with more dynamic movement pattern
+- Active microbes now have:
+  - Faster animation cycles
+  - Larger movement ranges (up to 12px displacement)
+  - More erratic, lifelike motion patterns
+- Result: Living microbes with propulsion now move noticeably faster and more dynamically than passive/static items 
+
+## Session 6: Fix Missing Input Import in Progress Dashboard
+
+### Issue: ReferenceError - Input is not defined
+- Error occurred in ProgressDashboard component when trying to use Input component
+- Root cause: Input component was not imported from UI library
+- Solution: Added `import { Input } from '@/components/ui/input.jsx';` to imports
+- Result: Progress Dashboard and Curriculum Settings now load without errors 
+
+## Session 7: Fix Target Card Image Clarity
+
+### User Request: Target card image appears discolored and blurred
+- Issue: Target card had semi-transparent background (bg-white/90) and backdrop blur
+- Changes made:
+  1. Changed card background from `bg-white/90 backdrop-blur-md` to `bg-white` (fully opaque)
+  2. Updated letter overlay from `text-black/80 bg-white/60` to `text-black bg-white/90`
+  3. Added border to letter circle for better definition
+- Result: Target card now displays crisp, clear images without any blur or discoloration 
+
+## Session 8: Fix Progress Dashboard Scrolling
+
+### User Request: Progress Dashboard is not scrollable when data runs off screen
+- Issue: Dashboard had no proper height constraints or overflow handling
+- Changes made:
+  1. Changed main container from `min-h-screen` to `h-screen flex flex-col overflow-hidden`
+  2. Added `flex-shrink-0` to header and navigation to keep them fixed
+  3. Added `overflow-x-auto` to navigation for horizontal scrolling on small screens
+  4. Wrapped main content in `flex-1 overflow-y-auto` container
+  5. Properly closed all div elements
+- Result: Progress Dashboard now has fixed header/nav with scrollable content area 
+
+## Session 9: Add OpenAI Image Generation for Word List
+
+### User Request: Automatically generate toddler-friendly images with transparent backgrounds
+- Updated OpenAI API service to use specific prompt format:
+  - "Please generate an image of a [word], in a cartoonish and colorful style appropriate for a toddler with a transparent background."
+  - Using DALL-E 3 model with vivid style for cartoonish appearance
+- Modified Progress Dashboard word list management:
+  1. Added automatic image generation when no custom image provided
+  2. Added loading state with spinner during generation
+  3. Convert generated images to base64 for localStorage storage
+  4. Display generated images properly in the word list table
+  5. Added helpful tip about automatic generation
+- Features:
+  - Automatic generation on word addition
+  - Loading indicator during API call
+  - Fallback to ❓ emoji if generation fails
+  - Alert message for API key issues
+  - Base64 storage for offline access
+- Result: Teachers can now add words and get appropriate images automatically generated 
+
+## Session 10: Organize Assets into Component-Specific Folders
+
+### User Request: Move SpellingMenu assets to dedicated folder
+- Moved space-themed assets from `src/assets/` to `src/assets/spelling-menu/`:
+  - moon.png
+  - meteor.png
+  - ufo.png
+  - cow.png
+  - rocket.png
+- Updated import paths in SpellingMenu.jsx to reflect new location
+- Result: Better organization of assets by component/feature 
+
+## Session 11: Update Image Generation Prompt for Tighter Shots
+
+### User Request: Add tight shot specification to image prompt
+- Updated OpenAI image generation prompt to include: "In a very tight shot so that the images display large in my app"
+- Full prompt now: "Please generate an image of a [word], in a cartoonish and colorful style appropriate for a toddler with a transparent background. In a very tight shot so that the images display large in my app."
+- Result: Generated images will be more zoomed-in/close-up, making them appear larger and more prominent in the app 
+
+## Session 12: Fix Target Card Letter Overlay Blocking Image
+
+### User Request: Letter circle was blocking the microscopic image
+- Issue: Large letter circle (w-20 h-20) was centered over the image, obscuring it
+- Changes made:
+  1. Moved letter to bottom-right corner (absolute positioning)
+  2. Reduced letter circle size from w-20/24 to w-12/14
+  3. Reduced font size from text-5xl/6xl to text-3xl/4xl
+  4. Reduced image padding from p-4 to p-2 for more space
+  5. Added shadow-lg to letter circle for better visibility
+- Result: Microscopic image is now clearly visible with letter displayed in corner 
+
+## Session 13: Fix Petri Dish Background
+- **Issue**: petri-background.png not loading due to require() syntax
+- **Solution**:
+  - Changed to ES6 import syntax
+  - Removed conditional loading logic
+  - Added proper styling with overflow-hidden
+
+## Session 14: Full Screen Petri Background
+- **Issue**: Background only displayed in center circle, not full screen
+- **Solution**:
+  - Moved background image to root container as full screen background
+  - Removed petri dish circular container
+  - Updated FloatingItem positioning to use grid layout across full screen
+  - Items now float freely across entire viewport with grid-based positioning
+
+## Session 15: Consistent Letter Display
+- **Issue**: Target card letter displayed differently than floating items (small corner vs centered overlay)
+- **Solution**:
+  - Updated target card to match floating item letter style
+  - Letter now centered over image with same size (text-4xl md:text-5xl)
+  - Same white color with drop shadow for consistency
+  - Makes matching much easier for users
+
+## Session 16: Crosshair Overlay and Item Positioning
+- **Issue**: Background reticule not visible over items, items floating outside petri dish area
+- **Solution**:
+  - Added crosshair overlay with bold black lines at 50% X and Y axes
+  - Lines use pointer-events-none to not interfere with clicking
+  - Changed item positioning from grid to circular constraint system
+  - Items now stay within 10-30% radius from center
+  - Prevents items from going outside the petri dish viewing area
+
+## Session 17: LetterLearner Home Button Update
+- **Issue**: Home button styling inconsistent with MatchingGame
+- **Solution**:
+  - Moved home button from bottom-right to top-right
+  - Applied same glassmorphic styling (bg-white/10 backdrop-blur-md)
+  - Modified alphabet grid to have empty top-right position, shifting all letters appropriately
+  - All 26 letters remain, with I moved to start of row 2
+  - Separated lock button to remain at bottom-right
+  - Consistent UI across all game modes
+
+## Session 18: Global Home Button Standardization
+- **Issue**: Home buttons inconsistent across entire app
+- **Solution**: Updated all components to use same position (top-right) and glassmorphic style
+  - SpellingMenu: Moved from bottom-right, separated cow animation
+  - LearnMode: Moved from bottom-right, separated lock button
+  - CopyMode: Moved from bottom-right, separated lock button
+  - FillBlankMode: Moved from bottom-right, separated lock button
+  - TestMode: Moved from bottom-right, separated lock button
+  - MagicPaint: Moved from top-left, shifted effects menu to left
+  - ProgressDashboard: Updated styling to match glassmorphic theme
+  - All buttons now: top-4 right-4, bg-white/10 backdrop-blur-md hover:bg-white/20 

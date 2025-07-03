@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { BookOpen, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 // Import the new space-themed assets
-import moon from '../assets/moon.png';
-import meteor from '../assets/meteor.png';
-import ufo from '../assets/ufo.png';
-import cow from '../assets/cow.png';
-import rocket from '../assets/rocket.png';
+import moon from '../assets/spelling-menu/moon.png';
+import meteor from '../assets/spelling-menu/meteor.png';
+import ufo from '../assets/spelling-menu/ufo.png';
+import cow from '../assets/spelling-menu/cow.png';
+import rocket from '../assets/spelling-menu/rocket.png';
 
 const SpellingMenu = ({ onSelectMode, onHome }) => {
   const modes = [
@@ -151,20 +151,24 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           />
           <div className="absolute text-5xl animate-satellite-pass">🛰️</div>
         </div>
-        {/* Header with home button */}
-        <div className="absolute bottom-7 right-4 z-10 flex items-center gap-2">
+        {/* Home button - top right */}
+        <div className="absolute top-4 right-4 z-20">
+          <Button
+            onClick={onHome}
+            className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+          >
+            <Home className="mr-2" size={20} />
+            Home
+          </Button>
+        </div>
+        
+        {/* Cow animation - bottom right */}
+        <div className="absolute bottom-7 right-4 z-10">
           <img 
             src={cow} 
             alt="Cow" 
             className="w-8 h-8 md:w-10 md:h-10 animate-cow-abduction" 
           />
-          <Button
-            onClick={onHome}
-            className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-            title="Home (Ctrl+Shift+H)"
-          >
-            <Home size={20} />
-          </Button>
         </div>
 
         {/* Mode Grid */}

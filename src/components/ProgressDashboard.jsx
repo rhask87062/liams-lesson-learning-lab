@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
@@ -7,9 +7,10 @@ import {
   Calendar as CalendarIcon, Clock, TrendingUp, Award, BookOpen, 
   Target, MessageSquare, Download, LogOut, User,
   CheckCircle, AlertCircle, Activity, Brain, Home, Lock, LockOpen,
-  Settings
+  Settings, Trash2, Plus, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
@@ -23,6 +24,7 @@ import {
 import { useTherapistAuth } from '@/hooks/useTherapistAuth.js';
 import Login from '@/components/Login.jsx';
 import { addDays, format } from "date-fns";
+import { getAllWords, unifiedWordDatabase } from '../lib/unifiedWordDatabase';
 
 export function ProgressDashboard({ 
   progressData, 
@@ -155,6 +157,15 @@ const DashboardContent = ({
   const [matchingGameItems, setMatchingGameItems] = useState(
     parseInt(localStorage.getItem('matchingGameItems') || '6')
   );
+  const [customWordList, setCustomWordList] = useState(() => {
+    const saved = localStorage.getItem('customWordList');
+    return saved ? JSON.parse(saved) : getAllWords();
+  });
+  const [newWord, setNewWord] = useState('');
+  const [newWordImage, setNewWordImage] = useState('');
+  const [editingWordIndex, setEditingWordIndex] = useState(null);
+  const [editingWord, setEditingWord] = useState({ word: '', image: '' });
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   // Load therapist notes
   useEffect(() => {
@@ -295,10 +306,105 @@ const DashboardContent = ({
     onAddNote(newNote);
   };
 
+  // Word list management functions
+  const handleAddWord = async () => {
+    if (newWord.trim() && !isGeneratingImage) {
+      let imageToUse = newWordImage || '❓';
+      
+      // If no custom image provided, generate one using OpenAI
+      if (!newWordImage) {
+        try {
+          setIsGeneratingImage(true);
+          
+          // Import the generateImage function
+          const { generateImage } = await import('../services/OpenAI_API.js');
+          
+          // Generate the image
+          const imageUrl = await generateImage(newWord.trim());
+          
+          // Convert to base64 for storage
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const reader = new FileReader();
+          
+          imageToUse = await new Promise((resolve, reject) => {
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          
+        } catch (error) {
+          console.error('Failed to generate image:', error);
+          // Fall back to emoji if generation fails
+          imageToUse = '❓';
+          alert('Failed to generate image. Please check your OpenAI API key. The word will be added with a placeholder.');
+        } finally {
+          setIsGeneratingImage(false);
+        }
+      }
+      
+      const newWordObj = {
+        id: Date.now(),
+        word: newWord.trim().toLowerCase(),
+        image: imageToUse,
+        category: 'custom',
+        pronunciation: `/${newWord.trim().toLowerCase()}/`
+      };
+      const updatedList = [...customWordList, newWordObj];
+      setCustomWordList(updatedList);
+      localStorage.setItem('customWordList', JSON.stringify(updatedList));
+      setNewWord('');
+      setNewWordImage('');
+      // Dispatch event so other components can update
+      window.dispatchEvent(new Event('wordListChanged'));
+    }
+  };
+
+  const handleDeleteWord = (index) => {
+    const updatedList = customWordList.filter((_, i) => i !== index);
+    setCustomWordList(updatedList);
+    localStorage.setItem('customWordList', JSON.stringify(updatedList));
+    window.dispatchEvent(new Event('wordListChanged'));
+  };
+
+  const handleEditWord = (index) => {
+    setEditingWordIndex(index);
+    setEditingWord({
+      word: customWordList[index].word,
+      image: customWordList[index].image
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingWordIndex !== null && editingWord.word.trim()) {
+      const updatedList = [...customWordList];
+      updatedList[editingWordIndex] = {
+        ...updatedList[editingWordIndex],
+        word: editingWord.word.trim().toLowerCase(),
+        image: editingWord.image || '❓',
+        pronunciation: `/${editingWord.word.trim().toLowerCase()}/`
+      };
+      setCustomWordList(updatedList);
+      localStorage.setItem('customWordList', JSON.stringify(updatedList));
+      setEditingWordIndex(null);
+      setEditingWord({ word: '', image: '' });
+      window.dispatchEvent(new Event('wordListChanged'));
+    }
+  };
+
+  const handleResetWordList = () => {
+    if (window.confirm('Are you sure you want to reset to the default word list? This will remove all custom words.')) {
+      const defaultList = getAllWords();
+      setCustomWordList(defaultList);
+      localStorage.setItem('customWordList', JSON.stringify(defaultList));
+      window.dispatchEvent(new Event('wordListChanged'));
+    }
+  };
+
     return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col overflow-hidden">
         {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex justify-between items-center py-4">
             {/* Left side */}
@@ -370,10 +476,10 @@ const DashboardContent = ({
               {/* Home Button */}
               <Button
                 onClick={onHome}
-                    className="p-2 h-9 w-9 bg-gray-100 text-gray-600"
-                title="Home (Ctrl+Shift+H)"
+                className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
               >
-                <Home size={20} />
+                <Home className="mr-2" size={20} />
+                Home
               </Button>
 
               {/* User Dropdown Menu */}
@@ -408,9 +514,9 @@ const DashboardContent = ({
       </div>
 
       {/* Navigation */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8 py-4">
+          <nav className="flex space-x-8 py-4 overflow-x-auto">
             {[
               { id: 'overview', label: 'Overview', icon: Activity },
               { id: 'progress', label: 'Progress Tracking', icon: TrendingUp },
@@ -437,7 +543,8 @@ const DashboardContent = ({
           </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* The rest of the UI from TherapistDashboard.jsx goes here */}
         {/* For brevity, I'll just show the 'overview' section, but all views are included */}
         {selectedView === 'overview' && (
@@ -545,7 +652,175 @@ const DashboardContent = ({
                   </div>
                 </div>
                 
-                {/* Future settings can be added here */}
+                {/* Word List Management */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    Word List Management
+                  </h3>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                    {/* Add new word */}
+                    <div>
+                      <p className="text-xs text-gray-600 mb-2">
+                        <strong>Tip:</strong> Leave the image field empty to automatically generate a colorful, toddler-friendly image using AI.
+                      </p>
+                      <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={newWord}
+                        onChange={(e) => setNewWord(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddWord()}
+                        placeholder="Add new word..."
+                        className="flex-1"
+                      />
+                      <Input
+                        type="text"
+                        value={newWordImage}
+                        onChange={(e) => setNewWordImage(e.target.value)}
+                        placeholder="Emoji or image..."
+                        className="w-32"
+                      />
+                      <Button 
+                        onClick={handleAddWord} 
+                        size="sm" 
+                        className="bg-blue-500 hover:bg-blue-600"
+                        disabled={isGeneratingImage || !newWord.trim()}
+                      >
+                        {isGeneratingImage ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                                                  )}
+                      </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Word list */}
+                    <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg bg-white">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 sticky top-0">
+                          <tr>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Word
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Image
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Category
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {customWordList.map((wordObj, index) => (
+                            <tr key={wordObj.id || index}>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {editingWordIndex === index ? (
+                                  <Input
+                                    type="text"
+                                    value={editingWord.word}
+                                    onChange={(e) => setEditingWord({ ...editingWord, word: e.target.value })}
+                                    className="w-24"
+                                  />
+                                ) : (
+                                  wordObj.word
+                                )}
+                              </td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                                {editingWordIndex === index ? (
+                                  <Input
+                                    type="text"
+                                    value={editingWord.image}
+                                    onChange={(e) => setEditingWord({ ...editingWord, image: e.target.value })}
+                                    className="w-16"
+                                  />
+                                ) : (
+                                  wordObj.image.startsWith('data:image') ? (
+                                    <img 
+                                      src={wordObj.image} 
+                                      alt={wordObj.word}
+                                      className="w-10 h-10 object-contain"
+                                    />
+                                  ) : (
+                                    <span className="text-2xl">{wordObj.image}</span>
+                                  )
+                                )}
+                              </td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                                {wordObj.category}
+                              </td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                                {editingWordIndex === index ? (
+                                  <div className="flex gap-1">
+                                    <Button
+                                      onClick={handleSaveEdit}
+                                      size="sm"
+                                      variant="default"
+                                      className="text-xs"
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        setEditingWordIndex(null);
+                                        setEditingWord({ word: '', image: '' });
+                                      }}
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="flex gap-1">
+                                    <Button
+                                      onClick={() => handleEditWord(index)}
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      onClick={() => handleDeleteWord(index)}
+                                      size="sm"
+                                      variant="destructive"
+                                      className="text-xs"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {/* Word count and reset button */}
+                    <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        Total words: <strong>{customWordList.length}</strong>
+                      </p>
+                      <Button
+                        onClick={handleResetWordList}
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        Reset to Default
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tips */}
                 <div className="mt-8 p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-800">
                     <strong>Tip:</strong> These settings affect all children using this device. 
@@ -558,6 +833,7 @@ const DashboardContent = ({
         )}
         
         {/* ... other selected views ... */}
+        </div>
       </div>
     </div>
   );

@@ -12,25 +12,50 @@ import stegoIcon from '/src/assets/stego.png';
 const AlphabetGrid = ({ onLetterSelect, activeKey }) => {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   
+  // Create array with empty slot at position 8 (top-right corner)
+  const gridItems = [];
+  let letterIndex = 0;
+  
+  for (let i = 0; i < 27; i++) { // 27 slots total (26 letters + 1 empty)
+    if (i === 8) {
+      // Empty slot for home button in top-right
+      gridItems.push({ type: 'empty', key: 'empty-home' });
+    } else {
+      // Add letter
+      gridItems.push({ 
+        type: 'letter', 
+        letter: alphabet[letterIndex], 
+        key: alphabet[letterIndex] 
+      });
+      letterIndex++;
+    }
+  }
+  
   return (
     <div className="h-full grid grid-cols-9 grid-rows-3 gap-1 p-1">
-      {alphabet.map((letter) => (
-        <Button
-          key={letter}
-          onClick={() => onLetterSelect(letter)}
-          className={`
-            w-full h-full flex items-center justify-center text-4xl md:text-5xl font-bold rounded-2xl border-2 border-white bg-black/20 hover:bg-black/40
-            text-white
-            hover:scale-105 hover:shadow-lg hover:z-10
-            active:scale-95 transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:z-10
-            ${activeKey === letter ? 'bg-yellow-500/50 scale-110 ring-4 ring-yellow-400' : ''}
-          `}
-          data-letter={letter}
-        >
-          {letter}
-        </Button>
-      ))}
+      {gridItems.map((item) => {
+        if (item.type === 'empty') {
+          return <div key={item.key} />; // Empty cell for home button
+        }
+        
+        return (
+          <Button
+            key={item.key}
+            onClick={() => onLetterSelect(item.letter)}
+            className={`
+              w-full h-full flex items-center justify-center text-4xl md:text-5xl font-bold rounded-2xl border-2 border-white bg-black/20 hover:bg-black/40
+              text-white
+              hover:scale-105 hover:shadow-lg hover:z-10
+              active:scale-95 transition-all duration-200
+              focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:z-10
+              ${activeKey === item.letter ? 'bg-yellow-500/50 scale-110 ring-4 ring-yellow-400' : ''}
+            `}
+            data-letter={item.letter}
+          >
+            {item.letter}
+          </Button>
+        );
+      })}
     </div>
   );
 };
@@ -241,20 +266,25 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
         )}
       </AnimatePresence>
       
-      <div className="absolute bottom-4 right-4 z-30 flex gap-2">
+      {/* Home button - top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <Button
+          onClick={onHome}
+          className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+        >
+          <Home className="mr-2" size={20} />
+          Home
+        </Button>
+      </div>
+
+      {/* Lock button - bottom right */}
+      <div className="absolute bottom-4 right-4 z-30">
         <Button
           onClick={onLock}
           className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500/70 hover:bg-orange-600/70' : 'bg-gray-500/70 hover:bg-gray-600/70'} text-white border-0`}
           title={isNavigationLocked ? "Unlock Navigation (Ctrl+L)" : "Lock Navigation (Ctrl+L)"}
         >
           {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
-        </Button>
-        <Button
-          onClick={onHome}
-          className="bg-green-500/70 hover:bg-green-600/70 text-white px-4 py-2 border-0"
-          title="Home (Ctrl+Shift+H)"
-        >
-          <Home size={20} />
         </Button>
       </div>
 

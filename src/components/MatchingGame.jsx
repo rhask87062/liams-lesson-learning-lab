@@ -15,27 +15,20 @@ import sodiumCrystal from '../assets/matching-game/sodium-crystal.png';
 import euglena from '../assets/matching-game/euglena.png';
 import virus from '../assets/matching-game/virus.png';
 import rainbowPollenGrain from '../assets/matching-game/rainbow-pollen-grain.png';
+import petriBackground from '../assets/matching-game/petri-background.png';
 
-// Try to import petri background - will use gradient fallback if not available
-let petriBackground = null;
-try {
-  petriBackground = require('../assets/matching-game/petri-background.png');
-} catch (e) {
-  // File doesn't exist yet, will use gradient background
-}
-
-// Microscopic items configuration
+// Microscopic items configuration with movement types
 const microscopicItems = [
-  { id: 1, name: 'Amoeba', image: amoeba },
-  { id: 2, name: 'Paramecium', image: paramecium },
-  { id: 3, name: 'Diatom', image: diatom },
-  { id: 4, name: 'Red Blood Cell', image: redBloodCell },
-  { id: 5, name: 'White Blood Cell', image: whiteBloodCell },
-  { id: 6, name: 'Mold Spore', image: moldSpore },
-  { id: 7, name: 'Sodium Crystal', image: sodiumCrystal },
-  { id: 8, name: 'Euglena', image: euglena },
-  { id: 9, name: 'Virus', image: virus },
-  { id: 10, name: 'Pollen Grain', image: rainbowPollenGrain },
+  { id: 1, name: 'Amoeba', image: amoeba, movementType: 'active' }, // Moves with pseudopods
+  { id: 2, name: 'Paramecium', image: paramecium, movementType: 'active' }, // Moves with cilia
+  { id: 3, name: 'Diatom', image: diatom, movementType: 'passive' }, // Non-living, drifts
+  { id: 4, name: 'Red Blood Cell', image: redBloodCell, movementType: 'passive' }, // No self-propulsion
+  { id: 5, name: 'White Blood Cell', image: whiteBloodCell, movementType: 'active' }, // Moves actively
+  { id: 6, name: 'Mold Spore', image: moldSpore, movementType: 'passive' }, // Drifts
+  { id: 7, name: 'Sodium Crystal', image: sodiumCrystal, movementType: 'static' }, // Non-living crystal
+  { id: 8, name: 'Euglena', image: euglena, movementType: 'active' }, // Moves with flagellum
+  { id: 9, name: 'Virus', image: virus, movementType: 'passive' }, // No self-propulsion
+  { id: 10, name: 'Pollen Grain', image: rainbowPollenGrain, movementType: 'static' }, // Non-living
 ];
 
 // Letters to use for matching
@@ -53,11 +46,34 @@ const shuffle = (array) => {
 
 // Floating item component
 const FloatingItem = ({ item, letter, onClick, isSelected, isCorrect, isTarget, index, totalItems }) => {
-  // Calculate position in a circular pattern
-  const angle = (index / totalItems) * 2 * Math.PI;
-  const radius = 35; // percentage of container
+  // Calculate position within a constrained circular area
+  const angle = (index / totalItems) * 2 * Math.PI + (Math.random() * 0.5);
+  const maxRadius = 30; // Keep items within 30% radius from center
+  const minRadius = 10; // Minimum distance from center
+  const radius = minRadius + (Math.random() * (maxRadius - minRadius));
+  
+  // Center at 50%, 50% with radius constraints
   const x = 50 + radius * Math.cos(angle);
   const y = 50 + radius * Math.sin(angle);
+
+  // Determine animation duration based on movement type
+  const getAnimationDuration = () => {
+    switch (item.movementType) {
+      case 'active': // Living microbes with propulsion
+        return 4 + (index % 3) * 1; // 4-6 seconds
+      case 'passive': // Living but no self-propulsion
+        return 8 + (index % 3) * 2; // 8-12 seconds
+      case 'static': // Non-living particles
+        return 12 + (index % 3) * 3; // 12-18 seconds
+      default:
+        return 8 + index * 2;
+    }
+  };
+
+  // Choose animation name based on movement type
+  const getAnimationName = () => {
+    return item.movementType === 'active' ? 'float-active' : 'float';
+  };
 
   return (
     <div
@@ -74,8 +90,8 @@ const FloatingItem = ({ item, letter, onClick, isSelected, isCorrect, isTarget, 
         left: `${x}%`,
         top: `${y}%`,
         transform: `translate(-50%, -50%)`,
-        animation: `float ${5 + index}s ease-in-out infinite`,
-        animationDelay: `${index * 0.5}s`
+        animation: `${getAnimationName()} ${getAnimationDuration()}s ease-in-out infinite`,
+        animationDelay: `${index * 0.3}s`
       }}
     >
       <div className="relative w-full h-full">
@@ -170,12 +186,15 @@ const MatchingGame = ({ onHome }) => {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 p-4 overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-purple-500/10 rounded-full blur-2xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-2xl animate-pulse animation-delay-2000" />
-      </div>
+    <div 
+      className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden"
+      style={{
+        backgroundImage: `url(${petriBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
 
       {/* Score and Round display */}
       <div className="absolute top-4 left-4 z-20">
@@ -196,22 +215,8 @@ const MatchingGame = ({ onHome }) => {
         </Button>
       </div>
 
-      {/* Main petri dish container */}
-      <div className="relative w-[600px] h-[600px] md:w-[800px] md:h-[800px] max-w-[90vw] max-h-[70vh]">
-        {/* Petri dish background */}
-        <div 
-          className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100/10 to-gray-300/10 border-4 border-white/50 shadow-2xl"
-          style={petriBackground ? {
-            backgroundImage: `url(${petriBackground})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          } : {}}
-        >
-          {/* Inner circle for depth effect */}
-          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-transparent to-white/5 border border-white/10" />
-        </div>
-
-        {/* Floating microscopic items */}
+      {/* Floating microscopic items directly on background */}
+      <div className="absolute inset-0">
         {gameItems.map((item, index) => (
           <FloatingItem
             key={item.uniqueId}
@@ -227,21 +232,29 @@ const MatchingGame = ({ onHome }) => {
         ))}
       </div>
 
+      {/* Crosshair/Reticule overlay */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Vertical line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-2 bg-black transform -translate-x-1/2"></div>
+        {/* Horizontal line */}
+        <div className="absolute top-1/2 left-0 right-0 h-2 bg-black transform -translate-y-1/2"></div>
+      </div>
+
       {/* Target card - bottom right */}
       <div className="absolute bottom-8 right-8 z-20">
         <div className="text-center">
           <p className="text-white text-xl font-bold mb-2">Find This:</p>
-          <Card className="w-40 h-40 md:w-48 md:h-48 bg-white/90 backdrop-blur-md border-4 border-yellow-400 shadow-2xl">
+          <Card className="w-40 h-40 md:w-48 md:h-48 bg-white border-4 border-yellow-400 shadow-2xl">
             <CardContent className="p-0 h-full flex items-center justify-center relative">
               {targetItem && (
                 <>
                   <img 
                     src={targetItem.image} 
                     alt={targetItem.name}
-                    className="w-full h-full object-contain p-4"
+                    className="w-full h-full object-contain p-2 rounded-full"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-5xl md:text-6xl font-bold text-black/80 bg-white/60 rounded-full w-20 h-20 md:w-24 md:h-24 flex items-center justify-center">
+                    <span className="text-4xl md:text-5xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       {targetItem.letter}
                     </span>
                   </div>
@@ -263,23 +276,7 @@ const MatchingGame = ({ onHome }) => {
         </div>
       )}
 
-      {/* CSS for floating animation */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translate(-50%, -50%) translateY(0px) rotate(0deg);
-          }
-          33% {
-            transform: translate(-50%, -50%) translateY(-10px) rotate(120deg);
-          }
-          66% {
-            transform: translate(-50%, -50%) translateY(10px) rotate(240deg);
-          }
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-      `}</style>
+
     </div>
   );
 };

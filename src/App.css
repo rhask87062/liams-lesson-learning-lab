@@ -298,16 +298,38 @@ body {
   overflow: hidden;
 }
 
-/* Matching game floating animation */
+/* Matching game floating animations */
 @keyframes float {
   0%, 100% {
-    transform: translate(-50%, -50%) translateY(0px) rotate(0deg);
+    transform: translate(-50%, -50%) translateY(0px) translateX(0px);
   }
-  33% {
-    transform: translate(-50%, -50%) translateY(-10px) rotate(120deg);
+  25% {
+    transform: translate(-50%, -50%) translateY(-8px) translateX(3px);
   }
-  66% {
-    transform: translate(-50%, -50%) translateY(10px) rotate(240deg);
+  50% {
+    transform: translate(-50%, -50%) translateY(-5px) translateX(-2px);
+  }
+  75% {
+    transform: translate(-50%, -50%) translateY(5px) translateX(2px);
+  }
+}
+
+/* More dynamic animation for active microbes */
+@keyframes float-active {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0px) translateX(0px);
+  }
+  20% {
+    transform: translate(-50%, -50%) translateY(-12px) translateX(8px);
+  }
+  40% {
+    transform: translate(-50%, -50%) translateY(-8px) translateX(-10px);
+  }
+  60% {
+    transform: translate(-50%, -50%) translateY(10px) translateX(-5px);
+  }
+  80% {
+    transform: translate(-50%, -50%) translateY(8px) translateX(12px);
   }
 }
 
