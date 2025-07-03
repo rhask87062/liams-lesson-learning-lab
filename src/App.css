@@ -298,3 +298,20 @@ body {
   overflow: hidden;
 }
 
+/* Matching game floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translate(-50%, -50%) translateY(-10px) rotate(120deg);
+  }
+  66% {
+    transform: translate(-50%, -50%) translateY(10px) rotate(240deg);
+  }
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+

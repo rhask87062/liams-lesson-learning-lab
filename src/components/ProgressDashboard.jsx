@@ -6,7 +6,8 @@ import {
 import { 
   Calendar as CalendarIcon, Clock, TrendingUp, Award, BookOpen, 
   Target, MessageSquare, Download, LogOut, User,
-  CheckCircle, AlertCircle, Activity, Brain, Home, Lock, LockOpen
+  CheckCircle, AlertCircle, Activity, Brain, Home, Lock, LockOpen,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { Calendar } from '@/components/ui/calendar';
@@ -151,6 +152,9 @@ const DashboardContent = ({
 }) => {
   const [selectedView, setSelectedView] = useState('overview');
   const [notes, setNotes] = useState([]);
+  const [matchingGameItems, setMatchingGameItems] = useState(
+    parseInt(localStorage.getItem('matchingGameItems') || '6')
+  );
 
   // Load therapist notes
   useEffect(() => {
@@ -412,7 +416,8 @@ const DashboardContent = ({
               { id: 'progress', label: 'Progress Tracking', icon: TrendingUp },
               { id: 'words', label: 'Word Analysis', icon: BookOpen },
               { id: 'sessions', label: 'Session Details', icon: CalendarIcon },
-              { id: 'notes', label: 'Notes & Observations', icon: MessageSquare }
+              { id: 'notes', label: 'Notes & Observations', icon: MessageSquare },
+              { id: 'settings', label: 'Curriculum Settings', icon: Settings }
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -482,6 +487,76 @@ const DashboardContent = ({
              {/* Additional charts and views would go here... */}
           </div>
         )}
+        
+        {/* Curriculum Settings View */}
+        {selectedView === 'settings' && (
+          <div className="space-y-8">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Curriculum Settings</h2>
+              
+              {/* Matching Game Settings */}
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center">
+                    <Settings className="w-5 h-5 mr-2" />
+                    Matching Game Settings
+                  </h3>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                    <div>
+                      <label htmlFor="matching-items" className="block text-sm font-medium text-gray-700 mb-2">
+                        Number of Items to Match
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Set how many different microscopic items appear in each round (minimum 4, maximum 10)
+                      </p>
+                      <div className="flex items-center space-x-4">
+                        <input
+                          type="range"
+                          id="matching-items"
+                          min="4"
+                          max="10"
+                          value={matchingGameItems}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            setMatchingGameItems(value);
+                            localStorage.setItem('matchingGameItems', value.toString());
+                            // Dispatch event so matching game can update
+                            window.dispatchEvent(new Event('matchingGameSettingsChanged'));
+                          }}
+                          className="flex-1"
+                        />
+                        <span className="text-lg font-semibold text-gray-700 w-8">
+                          {matchingGameItems}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Easier</span>
+                        <span>Harder</span>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        <strong>Note:</strong> More items increase difficulty as children need to distinguish between more options. 
+                        Start with fewer items for younger learners.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Future settings can be added here */}
+                <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Tip:</strong> These settings affect all children using this device. 
+                    Individual progress is tracked separately for each session.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* ... other selected views ... */}
       </div>
     </div>
