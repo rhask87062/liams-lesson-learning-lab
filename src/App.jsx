@@ -79,29 +79,6 @@ function App() {
 
     const style = document.createElement('style');
     style.innerHTML = `
-      @keyframes fly-by {
-        0% {
-          transform: translate(100vw, -100vh) scale(0);
-          opacity: 0;
-        }
-        30% {
-          transform: translate(50vw, -50vh) scale(1);
-          opacity: 1;
-        }
-        70% {
-          transform: translate(-50vw, 50vh) scale(1);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(-100vw, 100vh) scale(0);
-          opacity: 0;
-        }
-      }
-
-      .animate-fly-by {
-        animation: fly-by 18s linear infinite;
-      }
-
       .space-background {
         background: linear-gradient(to bottom right, black,rgb(5, 0, 96),rgb(21, 0, 183));
         overflow: hidden;
