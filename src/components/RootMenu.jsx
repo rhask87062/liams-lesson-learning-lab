@@ -15,11 +15,11 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'spelling',
       title: 'Spelling Games',
       asset: telescope,
-      position: 'absolute left-11 top-36',
-      size: 'w-28 h-28 md:w-48 md:h-48',
+      position: 'absolute left-[12%] top-[25%]',
+      size: 'w-[15%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#FBBF24]', // Yellow glow to match text-yellow-500
       labelColor: 'text-yellow-500',
-      labelGap: '-mt-1', // Custom gap for telescope
+      labelGap: 'mt-1', // Custom gap for telescope
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#FBBF24]',
       hoverTransform: 'group-hover:-translate-y-2', // 2px up for spelling
       hoverTextColor: 'group-hover:text-yellow-300' // Brighter yellow
@@ -28,11 +28,11 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'matching-game',
       title: 'Matching Game',
       asset: microscope,
-      position: 'absolute left-24 bottom-36',
-      size: 'w-24 h-24 md:w-40 md:h-40',
+      position: 'absolute left-[20%] bottom-[25%]',
+      size: 'w-[12%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#3B82F6]', // Blue glow to match text-blue-500
       labelColor: 'text-blue-500',
-      labelGap: '-mt-2', // Custom gap for microscope
+      labelGap: 'mt-1', // Custom gap for microscope
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#3B82F6]',
       hoverTransform: 'group-hover:-translate-y-2', // 2px up for matching
       hoverTextColor: 'group-hover:text-blue-300' // Brighter blue
@@ -41,11 +41,11 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'magic-paint',
       title: 'Magic Paint',
       asset: computer,
-      position: 'absolute right-28 top-36',
-      size: 'w-24 h-24 md:w-40 md:h-40',
+      position: 'absolute right-[20%] top-[25%]',
+      size: 'w-[12%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#10B981]', // Green glow to match text-green-500
       labelColor: 'text-green-500',
-      labelGap: '-mt-2', // Custom gap for computer
+      labelGap: 'mt-1', // Custom gap for computer
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#10B981]',
       hoverTransform: 'group-hover:-translate-y-2', // 2px up for magic paint
       hoverTextColor: 'group-hover:text-green-300' // Brighter green
@@ -54,11 +54,11 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'letter-learner',
       title: 'Letter Learner',
       asset: fossil,
-      position: 'absolute left-90 bottom-65',
-      size: 'w-20 h-20 md:w-88 md:h-88',
+      position: 'absolute left-[55%] bottom-[30%]',
+      size: 'w-[10%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#F97316]', // Orange glow to match text-orange-500
       labelColor: 'text-orange-500',
-      labelGap: '-mt-22', // Custom gap for fossil
+      labelGap: 'mt-1', // Custom gap for fossil
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#F97316]',
       hoverTransform: 'group-hover:-translate-y-3', // 4px up for letter learner
       hoverTextColor: 'group-hover:text-orange-300' // Brighter orange
@@ -233,82 +233,94 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
         }
       `}</style>
       <div 
-        className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${labBackground})` }}
+        className="flex items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden"
       >
-        {/* Banner at top */}
-        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
-          <img 
-            src={banner} 
-            alt="Liam's Learning Lab" 
-            className="h-16 md:h-24 w-auto transform scale-x-125"
-          />
-        </div>
-
-        {/* Progress Button - Top Right */}
-        <div className="absolute top-4 right-9 group cursor-pointer z-20">
-          <Button
-            onClick={onProgressDashboard}
-            className="w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-xl flex items-center justify-center text-lg font-medium border-2 border-white transition-all duration-300 group-hover:scale-110"
-          >
-            📊
-          </Button>
-          
-          {/* Progress Button Label */}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="text-blue-500 group-hover:text-blue-300 text-sm font-black whitespace-nowrap text-center transition-all duration-300" style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
-              Progress Data
-            </div>
+        {/* Background Image Container */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: `url(${labBackground})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        />
+        
+        {/* Content Container - maintains aspect ratio */}
+        <div className="relative w-full h-full min-h-screen">
+          {/* Banner at top */}
+          <div className="absolute top-[2%] left-1/2 transform -translate-x-1/2 z-10 w-[20%]">
+            <img 
+              src={banner} 
+              alt="Liam's Learning Lab" 
+              className="w-full h-auto"
+            />
           </div>
-        </div>
 
-        {/* Install App Button - Below Progress */}
-        {deferredPrompt && (
-          <div className="absolute top-20 right-9 group cursor-pointer z-20">
+          {/* Progress Button - Top Right */}
+          <div className="absolute top-[5%] right-[5%] group cursor-pointer z-20">
             <Button
-              onClick={onInstallApp}
-              className="w-14 h-14 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-xl flex items-center justify-center text-lg font-medium border-2 border-white transition-all duration-300 group-hover:drop-shadow-[0_0_15px_#10B981] group-hover:scale-110"
+              onClick={onProgressDashboard}
+              className="w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-xl flex items-center justify-center text-lg font-medium border-2 border-white transition-all duration-300 group-hover:scale-110"
             >
-              📱
+              📊
             </Button>
             
-            {/* Install Button Label */}
+            {/* Progress Button Label */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="text-green-500 group-hover:text-green-300 group-hover:drop-shadow-[0_0_15px_#10B981] text-sm font-black whitespace-nowrap text-center transition-all duration-300" style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
-                Install App
+              <div className="text-blue-500 group-hover:text-blue-300 text-sm font-black whitespace-nowrap text-center transition-all duration-300" style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
+                Progress Data
               </div>
             </div>
           </div>
-        )}
 
-        {/* Activity Buttons */}
-        {activities.map((activity) => (
-          <div
-            key={activity.id}
-            className={`${activity.position} group cursor-pointer`}
-            onClick={() => onSelectActivity(activity.id)}
-          >
-            {/* Activity Asset */}
-            <div className={`${activity.size} ${activity.hoverTransform} transition-all duration-300`}>
-              <img 
-                src={activity.asset} 
-                alt={activity.title}
-                className={`w-full h-full object-contain ${activity.glow} transition-all duration-300`}
-              />
-            </div>
-            
-            {/* Activity Label */}
-            <div className={`absolute top-full left-1/2 transform -translate-x-1/2 ${activity.labelGap} opacity-80 group-hover:opacity-100 transition-opacity duration-300`}>
-              <div className={`${activity.labelColor} ${activity.hoverTextColor} ${activity.textGlow} text-lg md:text-2xl font-black whitespace-nowrap text-center transition-all duration-300`} style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
-                {activity.title.split('').map((char, i) => (
-                  <span key={i} className="child-text">
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
+          {/* Install App Button - Below Progress */}
+          {deferredPrompt && (
+            <div className="absolute top-[13%] right-[5%] group cursor-pointer z-20">
+              <Button
+                onClick={onInstallApp}
+                className="w-14 h-14 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-xl flex items-center justify-center text-lg font-medium border-2 border-white transition-all duration-300 group-hover:drop-shadow-[0_0_15px_#10B981] group-hover:scale-110"
+              >
+                📱
+              </Button>
+              
+              {/* Install Button Label */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="text-green-500 group-hover:text-green-300 group-hover:drop-shadow-[0_0_15px_#10B981] text-sm font-black whitespace-nowrap text-center transition-all duration-300" style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
+                  Install App
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )}
+
+          {/* Activity Buttons */}
+          {activities.map((activity) => (
+            <div
+              key={activity.id}
+              className={`${activity.position} group cursor-pointer`}
+              onClick={() => onSelectActivity(activity.id)}
+            >
+              {/* Activity Asset */}
+              <div className={`${activity.size} ${activity.hoverTransform} transition-all duration-300`}>
+                <img 
+                  src={activity.asset} 
+                  alt={activity.title}
+                  className={`w-full h-full object-contain ${activity.glow} transition-all duration-300`}
+                />
+              </div>
+              
+              {/* Activity Label - positioned below the asset */}
+              <div className={`absolute top-full left-1/2 transform -translate-x-1/2 ${activity.labelGap} opacity-80 group-hover:opacity-100 transition-opacity duration-300`}>
+                <div className={`${activity.labelColor} ${activity.hoverTextColor} ${activity.textGlow} text-[1.2vw] font-black whitespace-nowrap text-center transition-all duration-300`} style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
+                  {activity.title.split('').map((char, i) => (
+                    <span key={i} className="child-text">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

@@ -299,3 +299,17 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
 - Updated word database to use .png image format
 - Created audio migration utility for future file storage
 - Audio recordings currently stored as base64 in localStorage
+
+## Session - Desktop Layout Responsive Positioning Fix
+- **Issue**: Desktop RootMenu items were using fixed pixel positioning that didn't scale with viewport
+- **Solution**: Converted all activity positions to percentage-based for responsive scaling
+  - Telescope (Spelling): left-[12%] top-[25%] with w-[15%]
+  - Microscope (Matching): left-[20%] bottom-[25%] with w-[12%]
+  - Computer (Magic Paint): right-[20%] top-[25%] with w-[12%]
+  - Fossil (Letter Learner): left-[55%] bottom-[30%] with w-[10%]
+- **Layout Improvements**:
+  - Background now in separate container layer for better control
+  - Banner uses percentage width (20%) for consistent scaling
+  - Progress/Install buttons positioned with percentages (5% from edges)
+  - Text size uses viewport-relative units (1.2vw) for proportional scaling
+  - Items maintain relative positions on lab counter at all desktop aspect ratios
