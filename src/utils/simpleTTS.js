@@ -27,7 +27,7 @@ const pronunciationFixes = {
 const audioCache = {};
 let currentAudio = null; // To keep track of the currently playing audio
 
-export const speak = async (text, { rate = 1, pitch = 1, voice = 'US English Female', onend } = {}) => {
+export const speak = async (text, { audioPath = null, rate = 1, pitch = 1, volume = 0.8, voice = 'US English Female', onend } = {}) => {
   const textToSpeak = pronunciationFixes[text.toLowerCase()] || text;
 
   // Stop any currently playing audio
@@ -37,6 +37,35 @@ export const speak = async (text, { rate = 1, pitch = 1, voice = 'US English Fem
     currentAudio = null;
   }
   
+  // --- Try custom audio clip first ---
+  if (audioPath) {
+    try {
+      console.log(`Playing custom audio for "${textToSpeak}" from path: ${audioPath}`);
+      const audio = new Audio(audioPath);
+      
+      // Set MIME type for m4a files if needed
+      if (audioPath.endsWith('.m4a')) {
+        audio.type = 'audio/mp4';
+      }
+      
+      // Boost volume for letter audio files
+      if (audioPath.includes('/audio/') && audioPath.match(/\/[a-z]\.m4a$/)) {
+        audio.volume = 1.0; // Max volume for letters
+        console.log('Boosting volume for letter audio');
+      } else {
+        audio.volume = 0.8; // Normal volume for other audio
+      }
+      
+      currentAudio = audio;
+      await audio.play();
+      if (onend) audio.onended = onend;
+      return; // Exit if custom audio succeeded
+    } catch (error) {
+      console.warn('Failed to play custom audio, falling back to other methods.', error);
+      // Continue to fallback methods
+    }
+  }
+
   // --- Try Google WaveNet TTS first ---
   try {
      // If we have a cached audio, play it directly.
@@ -118,6 +147,7 @@ export const speak = async (text, { rate = 1, pitch = 1, voice = 'US English Fem
     responsiveVoice.speak(textToSpeak, selectedVoice, {
       rate: rate,
       pitch: pitch,
+      volume: volume,
       onend: onend || function() {}
     });
     return;
@@ -131,6 +161,7 @@ export const speak = async (text, { rate = 1, pitch = 1, voice = 'US English Fem
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.rate = rate;
     utterance.pitch = pitch;
+    utterance.volume = volume;
     
     // Try to find a female English voice
     const voices = window.speechSynthesis.getVoices();
@@ -162,10 +193,11 @@ export const speakSequence = (items, delay = 800) => {
 
       const currentItem = items[index];
       const parameters = {
-        onend: () => setTimeout(() => speakItem(index + 1), delay)
+        onend: () => setTimeout(() => speakItem(index + 1), delay),
+        audioPath: currentItem.audioPath // Pass audioPath for sequence
       };
       
-      speak(currentItem, parameters);
+      speak(currentItem.text, parameters); // Pass text only if the item is an object with text property, otherwise pass the item directly
     };
 
     speakItem(0);

@@ -5,7 +5,7 @@ import * as TTS from '../utils/simpleTTS.js';
 export const unifiedWordDatabase = {
   // Core vocabulary organized by starting letter
   A: [
-    { word: 'apple', image: '/images/words/apple.jpg', category: 'food' },
+    { word: 'apple', image: '/images/words/apple.jpg', category: 'food', audioPath: '/audio/apple.wav' },
     { word: 'ant', image: '🐜', category: 'animals' }
   ],
   B: [
@@ -22,7 +22,7 @@ export const unifiedWordDatabase = {
   ],
   E: [
     { word: 'elephant', image: '🐘', category: 'animals' },
-    { word: 'egg', image: '��', category: 'food' },
+    { word: 'egg', image: '🥚', category: 'food' },
     { word: 'eleven', image: '1️⃣1️⃣', category: 'numbers' },
     { word: 'eighteen', image: '1️⃣8️⃣', category: 'numbers' }
   ],
@@ -128,7 +128,18 @@ export const unifiedWordDatabase = {
   '6': [{ word: 'six', image: '6️⃣', category: 'numbers' }],
   '7': [{ word: 'seven', image: '7️⃣', category: 'numbers' }],
   '8': [{ word: 'eight', image: '8️⃣', category: 'numbers' }],
-  '9': [{ word: 'nine', image: '9️⃣', category: 'numbers' }]
+  '9': [{ word: 'nine', image: '9️⃣', category: 'numbers' }],
+  '10': [{ word: 'ten', image: '🔟', category: 'numbers' }],
+  '11': [{ word: 'eleven', image: '1️⃣1️⃣', category: 'numbers' }],
+  '12': [{ word: 'twelve', image: '1️⃣2️⃣', category: 'numbers' }],
+  '13': [{ word: 'thirteen', image: '1️⃣3️⃣', category: 'numbers' }],
+  '14': [{ word: 'fourteen', image: '1️⃣4️⃣', category: 'numbers' }],
+  '15': [{ word: 'fifteen', image: '1️⃣5️⃣', category: 'numbers' }],
+  '16': [{ word: 'sixteen', image: '1️⃣6️⃣', category: 'numbers' }],
+  '17': [{ word: 'seventeen', image: '1️⃣7️⃣', category: 'numbers' }],
+  '18': [{ word: 'eighteen', image: '1️⃣8️⃣', category: 'numbers' }],
+  '19': [{ word: 'nineteen', image: '1️⃣9️⃣', category: 'numbers' }],
+  '20': [{ word: 'twenty', image: '2️⃣0️⃣', category: 'numbers' }]
 };
 
 // Get words for a specific letter
@@ -146,7 +157,8 @@ export const getAllWords = () => {
         word: wordObj.word,
         category: wordObj.category,
         image: wordObj.image,
-        pronunciation: `/${wordObj.word}/` // Simple pronunciation
+        pronunciation: wordObj.pronunciation || `/${wordObj.word}/`, // Use existing pronunciation or default
+        audioPath: wordObj.audioPath || null // Include audioPath
       });
     });
   });
@@ -154,9 +166,14 @@ export const getAllWords = () => {
 };
 
 // Enhanced speech functions using simple TTS
-export const speakWord = async (word) => {
+export const speakWord = async (wordObj) => {
   try {
-    await TTS.speak(word);
+    // If wordObj is a string, treat it as a simple word, otherwise assume it's a word object
+    if (typeof wordObj === 'string') {
+      await TTS.speak(wordObj);
+    } else if (wordObj && wordObj.word) {
+      await TTS.speak(wordObj.word, { audioPath: wordObj.audioPath });
+    }
   } catch (error) {
     console.error('Error speaking word:', error);
   }
@@ -164,7 +181,14 @@ export const speakWord = async (word) => {
 
 export const speakLetter = async (letter) => {
   try {
-    await TTS.speak(letter, { rate: 0.6, pitch: 1.1 });
+    // Check if it's a single letter and use the audio file if available
+    if (letter.length === 1 && /[A-Za-z]/.test(letter)) {
+      const audioPath = `/audio/${letter.toLowerCase()}.m4a`;
+      await TTS.speak(letter, { audioPath, rate: 0.6, pitch: 1.1, volume: 1.0 });
+    } else {
+      // For non-single letters or special cases, use regular TTS with boosted volume
+      await TTS.speak(letter, { rate: 0.6, pitch: 1.1, volume: 1.0 });
+    }
   } catch (error) {
     console.error('Error speaking letter:', error);
   }
@@ -172,7 +196,22 @@ export const speakLetter = async (letter) => {
 
 export const speakSequence = async (items, delay = 800) => {
   try {
-    await TTS.speakSequence(items, delay);
+    // Map items to an array of objects with text and audioPath for TTS.speakSequence
+    const speechItems = items.map(item => {
+      if (typeof item === 'string') {
+        return { text: item, audioPath: null };
+      } else if (item.word) {
+        // It's a word object
+        return { text: item.word, audioPath: item.audioPath || null };
+      } else if (item.text) {
+        // It already has text property
+        return { text: item.text, audioPath: item.audioPath || null };
+      } else {
+        // Fallback
+        return { text: String(item), audioPath: null };
+      }
+    });
+    await TTS.speakSequence(speechItems, delay);
   } catch (error) {
     console.error('Error speaking sequence:', error);
   }

@@ -56,7 +56,7 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
     await speakWord(currentWord.word);
   };
 
-  const checkAnswer = () => {
+  const checkAnswer = async () => {
     // For single letter input, check if the user typed the correct missing letter
     const expectedLetter = missingLetters[0]?.letter.toLowerCase();
     const userLetter = userInput.toLowerCase().trim();
@@ -64,6 +64,9 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
     const correct = userLetter === expectedLetter;
     setIsCorrect(correct);
     setShowFeedback(true);
+    
+    // Always play the word audio to reinforce learning
+    await handleSpeak();
     
     if (correct && onCorrect) {
       onCorrect();
@@ -73,7 +76,7 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
     if (correct) {
       setTimeout(() => {
         onNext();
-      }, 2000);
+      }, 2500); // Slightly longer delay to allow audio to finish
     }
   };
 

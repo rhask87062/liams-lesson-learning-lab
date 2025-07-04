@@ -1080,8 +1080,24 @@ const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
 
   const isComponentEffect = ['splashCursor', 'fluidCanvas', 'gradientTrail'].includes(currentEffect);
 
+  // Prevent scrolling on mobile when touching the canvas
+  useEffect(() => {
+    const preventScroll = (e) => {
+      e.preventDefault();
+    };
+
+    // Add touch event listeners to prevent scrolling
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchstart', preventScroll, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('touchstart', preventScroll);
+    };
+  }, []);
+
   return (
-    <div className="w-screen h-screen bg-black relative overflow-hidden">
+    <div className="w-screen h-screen bg-black relative overflow-hidden touch-none">
       {isComponentEffect ? (
         <>
           {currentEffect === 'splashCursor' && <SplashCursor />}
@@ -1089,7 +1105,7 @@ const MagicPaint = ({ onHome, onLock, isNavigationLocked }) => {
           {currentEffect === 'gradientTrail' && <CursorGradient />}
         </>
       ) : (
-        <canvas ref={canvasRef} className="w-full h-full" />
+        <canvas ref={canvasRef} className="w-full h-full touch-none" />
       )}
       <div className="absolute top-4 left-4 flex flex-col space-y-2 z-50">
         {effects.map((effect) => (

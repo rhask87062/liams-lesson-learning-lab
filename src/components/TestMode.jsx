@@ -19,13 +19,16 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
   if (!currentWord) return null;
 
   const handleSpeak = async () => {
-    await speakWord(currentWord.word);
+    await speakWord(currentWord);
   };
 
-  const checkSpelling = () => {
+  const checkSpelling = async () => {
     const correct = userInput.toLowerCase().trim() === currentWord.word.toLowerCase();
     setIsCorrect(correct);
     setShowFeedback(true);
+    
+    // Always play the word audio to reinforce learning
+    await handleSpeak();
     
     if (correct && onCorrect) {
       onCorrect();
@@ -35,7 +38,7 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
     if (correct) {
       setTimeout(() => {
         onNext();
-      }, 2000);
+      }, 2500); // Slightly longer delay to allow audio to finish
     }
   };
 
@@ -72,25 +75,33 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
-      {/* Home button - top right */}
-      <div className="absolute top-4 right-4 z-20">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-br from-red-400 via-pink-400 to-red-500 relative overflow-hidden">
+      {/* Navigation Protection Notice */}
+      {isNavigationLocked && (
+        <div className="absolute top-4 left-4 bg-orange-100 border-2 border-orange-400 rounded-xl p-3 shadow-lg z-10">
+          <div className="flex items-center space-x-2">
+            <Lock className="h-5 w-5 text-orange-600" />
+            <span className="text-sm font-semibold text-orange-800">Navigation Protected</span>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation buttons - top right */}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        <Button
+          onClick={onLock}
+          className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500/70 hover:bg-orange-600/70' : 'bg-gray-500/70 hover:bg-gray-600/70'} text-white border-0`}
+          title={isNavigationLocked ? "Unlock Navigation (Ctrl+L)" : "Lock Navigation (Ctrl+L)"}
+        >
+          {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
+        </Button>
         <Button
           onClick={onHome}
           className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+          disabled={isNavigationLocked}
         >
           <Home className="mr-2" size={20} />
           Home
-        </Button>
-      </div>
-
-      {/* Lock button - bottom right */}
-      <div className="absolute bottom-4 right-4 z-30">
-        <Button
-          onClick={onLock}
-          className={`px-4 py-2 ${isNavigationLocked ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-500 hover:bg-gray-600'} text-white rounded-lg`}
-        >
-          {isNavigationLocked ? <Lock size={20} /> : <LockOpen size={20} />}
         </Button>
       </div>
 
@@ -107,7 +118,7 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
       </div>
 
       {/* Challenge indicator */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-200 border-2 border-red-400 rounded-xl p-3 shadow-lg z-10">
+      <div className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-red-200 border-2 border-red-400 rounded-xl p-3 shadow-lg z-10">
         <span className="text-sm font-semibold text-red-800">🏆 Challenge Mode</span>
       </div>
 
@@ -209,5 +220,4 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
   );
 };
 
-export default TestMode;
-
+export default TestMode; 

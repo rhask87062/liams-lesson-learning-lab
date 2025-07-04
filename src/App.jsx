@@ -94,7 +94,7 @@ function App() {
     const style = document.createElement('style');
     style.innerHTML = `
       .space-background {
-        background: linear-gradient(to bottom right, black,rgb(5, 0, 96),rgb(21, 0, 183));
+        background: linear-gradient(to bottom right, #000000, #4B0082, #6A0DAD);
         overflow: hidden;
       }
 
@@ -397,6 +397,8 @@ function App() {
             onProgressDashboard={handleProgressDashboard}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}
+            onInstallApp={handleInstallClick}
+            deferredPrompt={deferredPrompt}
           />
         );
       case 'progress':

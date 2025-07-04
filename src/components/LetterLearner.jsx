@@ -170,7 +170,12 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
       setErupt(true);
       setIsAnimating(true);
       setActiveKey(letter); // Highlight the active letter
-      speakSequence([letter, wordToShow.word], 800);
+      
+      // Pass proper objects to speakSequence with audio paths
+      speakSequence([
+        { text: letter, audioPath: `/audio/${letter.toLowerCase()}.m4a` },  // Letter with m4a audio file
+        wordToShow  // Full word object with audioPath
+      ], 800);
 
       setTimeout(() => {
         setPopupWord(null);

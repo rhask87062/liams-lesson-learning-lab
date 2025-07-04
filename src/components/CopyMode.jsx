@@ -21,10 +21,13 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
     await speakWord(currentWord.word);
   };
 
-  const checkAnswer = () => {
+  const checkAnswer = async () => {
     const correct = userInput.toLowerCase().trim() === currentWord.word.toLowerCase();
     setIsCorrect(correct);
     setShowFeedback(true);
+    
+    // Always play the word audio to reinforce learning
+    await handleSpeak();
     
     if (correct && onCorrect) {
       onCorrect();
@@ -34,7 +37,7 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
     if (correct) {
       setTimeout(() => {
         onNext();
-      }, 2000);
+      }, 2500); // Slightly longer delay to allow audio to finish
     }
   };
 

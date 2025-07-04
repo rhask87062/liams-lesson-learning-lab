@@ -8,12 +8,13 @@ const LearnMode = ({ currentWord, onNext, onBack, onLock, onHome, isNavigationLo
   if (!currentWord) return null;
 
   const handleSpeak = async () => {
-    await speakWord(currentWord.word);
+    await speakWord(currentWord);
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      onNext();
+      handleSpeak();
+      setTimeout(() => onNext(), 500);
     }
     if (e.key === 'Escape') {
       onBack();

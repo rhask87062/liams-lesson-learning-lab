@@ -7,7 +7,7 @@ import {
   Calendar as CalendarIcon, Clock, TrendingUp, Award, BookOpen, 
   Target, MessageSquare, Download, LogOut, User,
   CheckCircle, AlertCircle, Activity, Brain, Home, Lock, LockOpen,
-  Settings, Trash2, Plus, Loader2
+  Settings, Trash2, Plus, Loader2, Mic
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
@@ -163,17 +163,31 @@ const DashboardContent = ({
     return saved ? JSON.parse(saved) : getAllWords();
   });
   const [newWord, setNewWord] = useState('');
-  const [newWordImage, setNewWordImage] = useState('');
   const [editingWordIndex, setEditingWordIndex] = useState(null);
   const [editingWord, setEditingWord] = useState({ word: '', image: '' });
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
+  const [newWordAudio, setNewWordAudio] = useState(null);
+  const [editingWordAudio, setEditingWordAudio] = useState(null);
 
   // Load therapist notes
   useEffect(() => {
     const savedNotes = JSON.parse(localStorage.getItem('therapistNotes') || '[]');
     setNotes(savedNotes);
   }, []);
+
+  // Cleanup effect for media recorder
+  useEffect(() => {
+    return () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        setMediaRecorder(null);
+      }
+    };
+  }, [mediaRecorder]);
 
   // Calculate key metrics
   const calculateMetrics = (data) => {
@@ -310,25 +324,36 @@ const DashboardContent = ({
 
   // Word list management functions
   const handleAddWord = async () => {
+    console.log('handleAddWord called', { newWord, isGeneratingImage, isCategorizing });
     if (newWord.trim() && !isGeneratingImage && !isCategorizing) {
-      let imageToUse = newWordImage || '❓';
-      let categoryToUse = 'custom';
-      
-      // If no custom image provided, generate one using OpenAI
-      if (!newWordImage) {
+      try {
+        let imageToUse = `/images/words/${newWord.trim().toLowerCase()}.png`;
+        let categoryToUse = 'custom';
+        let audioPathToUse = newWordAudio || null; // Use the base64 audio directly
+        
+        // Check if default image exists, if not generate one using OpenAI
+        const defaultImagePath = `/images/words/${newWord.trim().toLowerCase()}.png`;
         try {
-          setIsGeneratingImage(true);
-          const imageUrl = await generateImage(newWord.trim());
-          const response = await fetch(imageUrl);
-          const blob = await response.blob();
-          const reader = new FileReader();
-          
-          imageToUse = await new Promise((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-          
+          const response = await fetch(defaultImagePath);
+          if (response.ok) {
+            imageToUse = defaultImagePath;
+            console.log('Using existing image:', defaultImagePath);
+          } else {
+            // Generate new image
+            setIsGeneratingImage(true);
+            console.log('Generating image for:', newWord.trim());
+            const imageUrl = await generateImage(newWord.trim());
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const reader = new FileReader();
+            
+            imageToUse = await new Promise((resolve, reject) => {
+              reader.onloadend = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+            console.log('Image generated successfully');
+          }
         } catch (error) {
           console.error('Failed to generate image:', error);
           imageToUse = '❓';
@@ -336,35 +361,43 @@ const DashboardContent = ({
         } finally {
           setIsGeneratingImage(false);
         }
-      }
 
-      // Automatically categorize the word
-      try {
-        setIsCategorizing(true);
-        categoryToUse = await categorizeWord(newWord.trim());
+        // Automatically categorize the word
+        try {
+          setIsCategorizing(true);
+          console.log('Categorizing word:', newWord.trim());
+          categoryToUse = await categorizeWord(newWord.trim());
+          console.log('Word categorized as:', categoryToUse);
+        } catch (error) {
+          console.error('Failed to categorize word:', error);
+          // Fallback to 'custom' category, already initialized
+        } finally {
+          setIsCategorizing(false);
+        }
+        
+        const newWordObj = {
+          id: Date.now(),
+          word: newWord.trim().toLowerCase(),
+          image: imageToUse,
+          category: categoryToUse,
+          pronunciation: `/${newWord.trim().toLowerCase()}/`,
+          audioPath: audioPathToUse // Assign the audio path (already base64)
+        };
+        console.log('Creating new word object:', newWordObj);
+        const updatedList = [...customWordList, newWordObj];
+        // Sort the list alphabetically
+        updatedList.sort((a, b) => a.word.localeCompare(b.word));
+
+        setCustomWordList(updatedList);
+        localStorage.setItem('customWordList', JSON.stringify(updatedList));
+        console.log('Word list updated and saved');
+        setNewWord('');
+        setNewWordAudio(null); // Clear recorded audio after adding
+        window.dispatchEvent(new Event('wordListChanged'));
       } catch (error) {
-        console.error('Failed to categorize word:', error);
-        // Fallback to 'custom' category, already initialized
-      } finally {
-        setIsCategorizing(false);
+        console.error('Error in handleAddWord:', error);
+        alert('An error occurred while adding the word. Please try again.');
       }
-      
-      const newWordObj = {
-        id: Date.now(),
-        word: newWord.trim().toLowerCase(),
-        image: imageToUse,
-        category: categoryToUse,
-        pronunciation: `/${newWord.trim().toLowerCase()}/`
-      };
-      const updatedList = [...customWordList, newWordObj];
-      // Sort the list alphabetically
-      updatedList.sort((a, b) => a.word.localeCompare(b.word));
-
-      setCustomWordList(updatedList);
-      localStorage.setItem('customWordList', JSON.stringify(updatedList));
-      setNewWord('');
-      setNewWordImage('');
-      window.dispatchEvent(new Event('wordListChanged'));
     }
   };
 
@@ -379,18 +412,29 @@ const DashboardContent = ({
     setEditingWordIndex(index);
     setEditingWord({
       word: customWordList[index].word,
-      image: customWordList[index].image
+      image: customWordList[index].image,
+      audioPath: customWordList[index].audioPath || null // Load existing audio path
     });
+    setEditingWordAudio(null); // Clear temporary recording for edit
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingWordIndex !== null && editingWord.word.trim()) {
       const updatedList = [...customWordList];
+      let currentAudioPath = editingWordAudio || updatedList[editingWordIndex].audioPath || null;
+      
+      // Handle image path
+      let imagePath = editingWord.image || '❓';
+      if (imagePath.endsWith('.png') && !imagePath.startsWith('/') && !imagePath.startsWith('data:')) {
+        imagePath = `/images/words/${imagePath}`;
+      }
+
       updatedList[editingWordIndex] = {
         ...updatedList[editingWordIndex],
         word: editingWord.word.trim().toLowerCase(),
-        image: editingWord.image || '❓',
-        pronunciation: `/${editingWord.word.trim().toLowerCase()}/`
+        image: imagePath,
+        pronunciation: `/${editingWord.word.trim().toLowerCase()}/`,
+        audioPath: currentAudioPath // Use the base64 audio directly
       };
       // Ensure edited list is sorted alphabetically
       updatedList.sort((a, b) => a.word.localeCompare(b.word));
@@ -398,6 +442,7 @@ const DashboardContent = ({
       localStorage.setItem('customWordList', JSON.stringify(updatedList));
       setEditingWordIndex(null);
       setEditingWord({ word: '', image: '' });
+      setEditingWordAudio(null); // Clear editing audio after saving
       window.dispatchEvent(new Event('wordListChanged'));
     }
   };
@@ -410,6 +455,56 @@ const DashboardContent = ({
       setCustomWordList(defaultList);
       localStorage.setItem('customWordList', JSON.stringify(defaultList));
       window.dispatchEvent(new Event('wordListChanged'));
+    }
+  };
+
+  // Functions for audio recording
+  const startRecording = async (forEditing = false) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        
+        // Convert to base64 immediately
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Audio = reader.result;
+          if (forEditing) {
+            setEditingWordAudio(base64Audio);
+            setEditingWord(prev => ({ ...prev, audioPath: base64Audio }));
+          } else {
+            setNewWordAudio(base64Audio);
+          }
+        };
+        reader.readAsDataURL(audioBlob);
+        
+        // Stop all tracks in the stream to release microphone
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      alert('Could not start recording. Please ensure microphone access is granted.');
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      setIsRecording(false);
     }
   };
 
@@ -677,9 +772,9 @@ const DashboardContent = ({
                     {/* Add new word */}
                     <div>
                       <p className="text-xs text-gray-600 mb-2">
-                        <strong>Tip:</strong> Leave the image field empty to automatically generate a colorful, toddler-friendly image using AI.
+                        <strong>Tip:</strong> Images automatically use word.png format (e.g., "cat" uses cat.png). If not found, AI generates one.
                       </p>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-end">
                       <Input
                         type="text"
                         value={newWord}
@@ -688,13 +783,14 @@ const DashboardContent = ({
                         placeholder="Add new word..."
                         className="flex-1"
                       />
-                      <Input
-                        type="text"
-                        value={newWordImage}
-                        onChange={(e) => setNewWordImage(e.target.value)}
-                        placeholder="Emoji or image..."
-                        className="w-32"
-                      />
+                      <Button 
+                        onClick={() => isRecording ? stopRecording() : startRecording()}
+                        disabled={!newWord.trim() && !isRecording}
+                        className={`flex-shrink-0 ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-400 hover:bg-gray-500'}`}
+                      >
+                        {isRecording ? <div className="w-4 h-4 rounded-full bg-white animate-pulse"></div> : <Mic className="h-4 w-4" />}
+                        {isRecording ? 'Stop' : 'Record'}
+                      </Button>
                       <Button 
                         onClick={handleAddWord}
                         disabled={!newWord.trim() || isGeneratingImage || isCategorizing}
@@ -703,6 +799,14 @@ const DashboardContent = ({
                         {isGeneratingImage || isCategorizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                       </Button>
                       </div>
+                      {newWordAudio && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <audio controls src={newWordAudio}></audio>
+                          <Button size="sm" variant="destructive" onClick={() => setNewWordAudio(null)}>
+                            <Trash2 className="h-4 w-4"/>
+                          </Button>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Word list */}
@@ -718,6 +822,9 @@ const DashboardContent = ({
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Category
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Audio
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Actions
@@ -741,26 +848,80 @@ const DashboardContent = ({
                               </td>
                               <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
                                 {editingWordIndex === index ? (
-                                  <Input
-                                    type="text"
-                                    value={editingWord.image}
-                                    onChange={(e) => setEditingWord({ ...editingWord, image: e.target.value })}
-                                    className="w-16"
-                                  />
+                                  <div className="flex items-center gap-2">
+                                    <div className="relative">
+                                      {editingWord.image.startsWith('data:image') || editingWord.image.startsWith('/') || editingWord.image.endsWith('.png') ? (
+                                        <img 
+                                          src={editingWord.image.endsWith('.png') && !editingWord.image.startsWith('/') ? `/images/words/${editingWord.image}` : editingWord.image} 
+                                          alt={editingWord.word}
+                                          className="w-10 h-10 object-contain cursor-pointer hover:opacity-80"
+                                          onClick={() => {
+                                            const newImage = prompt('Enter new image (emoji, filename.png, or full path):', editingWord.image);
+                                            if (newImage !== null) {
+                                              setEditingWord({ ...editingWord, image: newImage });
+                                            }
+                                          }}
+                                        />
+                                      ) : (
+                                        <span 
+                                          className="text-2xl cursor-pointer hover:opacity-80"
+                                          onClick={() => {
+                                            const newImage = prompt('Enter new image (emoji, filename.png, or full path):', editingWord.image);
+                                            if (newImage !== null) {
+                                              setEditingWord({ ...editingWord, image: newImage });
+                                            }
+                                          }}
+                                        >
+                                          {editingWord.image}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
                                 ) : (
-                                  wordObj.image.startsWith('data:image') || wordObj.image.startsWith('/') ? (
-                                    <img 
-                                      src={wordObj.image} 
-                                      alt={wordObj.word}
-                                      className="w-10 h-10 object-contain"
-                                    />
-                                  ) : (
-                                    <span className="text-2xl">{wordObj.image}</span>
-                                  )
+                                  <div 
+                                    className="cursor-pointer hover:opacity-80"
+                                    onClick={() => handleEditWord(index)}
+                                    title="Click to edit"
+                                  >
+                                    {wordObj.image.startsWith('data:image') || wordObj.image.startsWith('/') || wordObj.image.endsWith('.png') ? (
+                                      <img 
+                                        src={wordObj.image.endsWith('.png') && !wordObj.image.startsWith('/') ? `/images/words/${wordObj.image}` : wordObj.image} 
+                                        alt={wordObj.word}
+                                        className="w-10 h-10 object-contain"
+                                        onError={(e) => {
+                                          e.target.onerror = null;
+                                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iI0UwRTBFMCIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmaWxsPSIjOTk5Ij7inJM8L3RleHQ+Cjwvc3ZnPg==';
+                                        }}
+                                      />
+                                    ) : (
+                                      <span className="text-2xl">{wordObj.image}</span>
+                                    )}
+                                  </div>
                                 )}
                               </td>
                               <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
                                 {wordObj.category}
+                              </td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                                {editingWordIndex === index ? (
+                                  <div className="flex items-center gap-1">
+                                    <Button 
+                                      onClick={() => isRecording ? stopRecording() : startRecording(true)}
+                                      disabled={!editingWord.word.trim() && !isRecording}
+                                      className={`flex-shrink-0 ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-400 hover:bg-gray-500'} w-8 h-8 p-0`}
+                                    >
+                                      {isRecording ? <div className="w-3 h-3 rounded-full bg-white animate-pulse"></div> : <Mic className="h-4 w-4" />}
+                                    </Button>
+                                    {editingWordAudio && (
+                                      <audio controls src={editingWordAudio}></audio>
+                                    )}
+                                    {!editingWordAudio && wordObj.audioPath && (
+                                      <audio controls src={wordObj.audioPath}></audio>
+                                    )}
+                                  </div>
+                                ) : (
+                                  wordObj.audioPath ? <audio controls src={wordObj.audioPath}></audio> : 'N/A'
+                                )}
                               </td>
                               <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">
                                 {editingWordIndex === index ? (
@@ -777,6 +938,7 @@ const DashboardContent = ({
                                       onClick={() => {
                                         setEditingWordIndex(null);
                                         setEditingWord({ word: '', image: '' });
+                                        setEditingWordAudio(null); // Clear editing audio
                                       }}
                                       size="sm"
                                       variant="outline"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BookOpen, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import { useIsMobile } from '../hooks/use-mobile';
 // Import the new space-themed assets
 import moon from '../assets/spelling-menu/moon.png';
 import meteor from '../assets/spelling-menu/meteor.png';
@@ -10,6 +11,7 @@ import rocket from '../assets/spelling-menu/rocket.png';
 import satellite from '../assets/satellite.png'; // Import satellite.png
 
 const SpellingMenu = ({ onSelectMode, onHome }) => {
+  const isMobile = useIsMobile();
   const [animateItems, setAnimateItems] = useState({
     satellite: false,
     rocket: false,
@@ -88,6 +90,91 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
     }
   };
 
+  // Mobile Layout - Simplified with night sky backdrop
+  if (isMobile) {
+    return (
+      <>
+        <style>{`
+          .celestial-glow {
+            filter: drop-shadow(0 0 6px rgba(245, 245, 224, 0.8));
+          }
+          @keyframes pulse-glow {
+            0%, 100% {
+              opacity: 0.3;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 1;
+              transform: scale(1.2);
+            }
+          }
+          .animate-pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+          }
+        `}</style>
+        <div className="min-h-screen bg-gradient-to-br from-black via-indigo-900 to-purple-900 overflow-y-auto pb-20 relative">
+          {/* Stars background */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none">
+            {Array.from({ length: 50 }, (_, i) => (
+              <div
+                key={i}
+                className="absolute animate-pulse-glow celestial-glow"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  fontSize: `${Math.random() * 0.5 + 0.3}rem`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${Math.random() * 2 + 3}s`
+                }}
+              >
+                ⭐
+              </div>
+            ))}
+          </div>
+
+          {/* Home button - fixed top right */}
+          <div className="fixed top-4 right-4 z-50">
+            <Button
+              onClick={onHome}
+              className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20"
+            >
+              <Home size={20} />
+            </Button>
+          </div>
+
+          {/* Header */}
+          <div className="text-center pt-16 pb-6 px-4 relative z-10">
+            <h1 className="text-3xl font-bold text-white mb-2">Spelling Games</h1>
+            <p className="text-white/80">Choose a game mode</p>
+          </div>
+
+          {/* Mode Cards */}
+          <div className="grid grid-cols-1 gap-4 max-w-md mx-auto px-4 relative z-10">
+            {modes.map((mode, index) => (
+              <button
+                key={mode.id}
+                onClick={() => onSelectMode(mode.id)}
+                className={`bg-gradient-to-br ${mode.color} rounded-2xl p-6 shadow-lg transform transition-all duration-200 hover:scale-105 active:scale-95`}
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="text-4xl">{mode.emoji}</div>
+                  <div className="flex-1 text-left">
+                    <h2 className="text-xl font-bold text-white">{mode.title}</h2>
+                    <p className="text-white/80 text-sm">{mode.description}</p>
+                  </div>
+                  <div className="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center">
+                    <span className="text-white font-bold">{index + 1}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Desktop/Tablet Layout - Original with animations
   return (
     <>
       <style>{`
