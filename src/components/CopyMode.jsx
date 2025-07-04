@@ -18,7 +18,7 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
   if (!currentWord) return null;
 
   const handleSpeak = async () => {
-    await speakWord(currentWord.word);
+    await speakWord(currentWord);
   };
 
   const checkAnswer = async () => {

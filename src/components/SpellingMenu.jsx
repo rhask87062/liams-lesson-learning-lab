@@ -112,7 +112,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
             animation: pulse-glow 3s ease-in-out infinite;
           }
         `}</style>
-        <div className="min-h-screen bg-gradient-to-br from-black via-indigo-900 to-purple-900 overflow-y-auto pb-20 relative">
+        <div className="min-h-screen overflow-y-auto pb-20 relative" style={{ background: 'linear-gradient(to bottom right, #000000,rgb(14, 1, 84),rgb(14, 1, 144))' }}>
           {/* Stars background */}
           <div className="fixed inset-0 overflow-hidden pointer-events-none">
             {Array.from({ length: 50 }, (_, i) => (
@@ -149,7 +149,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           </div>
 
           {/* Mode Cards */}
-          <div className="grid grid-cols-1 gap-4 max-w-md mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 gap-4 mx-auto px-4 relative z-10" style={{ width: 'min(80%, max(60%, 100vw - 2rem))' }}>
             {modes.map((mode, index) => (
               <button
                 key={mode.id}

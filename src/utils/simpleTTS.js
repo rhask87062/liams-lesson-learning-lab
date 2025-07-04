@@ -50,8 +50,19 @@ export const speak = async (text, { audioPath = null, rate = 1, pitch = 1, volum
       
       // Boost volume for letter audio files
       if (audioPath.includes('/audio/') && audioPath.match(/\/[a-z]\.m4a$/)) {
-        audio.volume = 1.0; // Max volume for letters
-        console.log('Boosting volume for letter audio');
+        // Use Web Audio API to amplify letter audio beyond normal limits
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaElementSource(audio);
+        const gainNode = audioContext.createGain();
+        
+        // Triple the volume (3x amplification - 1.5x louder than previous 2x)
+        gainNode.gain.value = 3.0;
+        
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        audio.volume = 1.0; // Still set to max
+        console.log('Amplifying letter audio with 3x gain');
       } else {
         audio.volume = 0.8; // Normal volume for other audio
       }

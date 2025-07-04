@@ -158,6 +158,12 @@ const DashboardContent = ({
   const [matchingGameItems, setMatchingGameItems] = useState(
     parseInt(localStorage.getItem('matchingGameItems') || '6')
   );
+  const [spellingMaxWordLength, setSpellingMaxWordLength] = useState(
+    parseInt(localStorage.getItem('spellingMaxWordLength') || '10')
+  );
+  const [fillBlankPercentage, setFillBlankPercentage] = useState(
+    parseInt(localStorage.getItem('fillBlankPercentage') || '30')
+  );
   const [customWordList, setCustomWordList] = useState(() => {
     const saved = localStorage.getItem('customWordList');
     return saved ? JSON.parse(saved) : getAllWords();
@@ -381,7 +387,7 @@ const DashboardContent = ({
           image: imageToUse,
           category: categoryToUse,
           pronunciation: `/${newWord.trim().toLowerCase()}/`,
-          audioPath: audioPathToUse // Assign the audio path (already base64)
+          audioPath: audioPathToUse // Keep base64 for now, would save to file in production
         };
         console.log('Creating new word object:', newWordObj);
         const updatedList = [...customWordList, newWordObj];
@@ -742,9 +748,19 @@ const DashboardContent = ({
                           }}
                           className="flex-1"
                         />
-                        <span className="text-lg font-semibold text-gray-700 w-8">
-                          {matchingGameItems}
-                        </span>
+                        <input
+                          type="number"
+                          min="4"
+                          max="10"
+                          value={matchingGameItems}
+                          onChange={(e) => {
+                            const value = Math.max(4, Math.min(10, parseInt(e.target.value) || 4));
+                            setMatchingGameItems(value);
+                            localStorage.setItem('matchingGameItems', value.toString());
+                            window.dispatchEvent(new Event('matchingGameSettingsChanged'));
+                          }}
+                          className="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
                         <span>Easier</span>
@@ -756,6 +772,113 @@ const DashboardContent = ({
                       <p className="text-sm text-gray-600">
                         <strong>Note:</strong> More items increase difficulty as children need to distinguish between more options. 
                         Start with fewer items for younger learners.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Spelling Game Settings */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-800 mb-4 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    Spelling Game Settings
+                  </h3>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-6">
+                    {/* Word Length Difficulty */}
+                    <div>
+                      <label htmlFor="word-length" className="block text-sm font-medium text-gray-700 mb-2">
+                        Maximum Word Length
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Only show words with this many letters or fewer (3-15 letters)
+                      </p>
+                      <div className="flex items-center space-x-4">
+                        <input
+                          type="range"
+                          id="word-length"
+                          min="3"
+                          max="15"
+                          value={spellingMaxWordLength}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            setSpellingMaxWordLength(value);
+                            localStorage.setItem('spellingMaxWordLength', value.toString());
+                            window.dispatchEvent(new Event('spellingSettingsChanged'));
+                          }}
+                          className="flex-1"
+                        />
+                        <input
+                          type="number"
+                          min="3"
+                          max="15"
+                          value={spellingMaxWordLength}
+                          onChange={(e) => {
+                            const value = Math.max(3, Math.min(15, parseInt(e.target.value) || 3));
+                            setSpellingMaxWordLength(value);
+                            localStorage.setItem('spellingMaxWordLength', value.toString());
+                            window.dispatchEvent(new Event('spellingSettingsChanged'));
+                          }}
+                          className="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Short words</span>
+                        <span>Long words</span>
+                      </div>
+                    </div>
+                    
+                    {/* Fill in the Blanks Percentage */}
+                    <div>
+                      <label htmlFor="blank-percentage" className="block text-sm font-medium text-gray-700 mb-2">
+                        Fill in the Blanks Difficulty
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Percentage of letters to hide (10-70%)
+                      </p>
+                      <div className="flex items-center space-x-4">
+                        <input
+                          type="range"
+                          id="blank-percentage"
+                          min="10"
+                          max="70"
+                          step="10"
+                          value={fillBlankPercentage}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            setFillBlankPercentage(value);
+                            localStorage.setItem('fillBlankPercentage', value.toString());
+                            window.dispatchEvent(new Event('spellingSettingsChanged'));
+                          }}
+                          className="flex-1"
+                        />
+                        <div className="flex items-center">
+                          <input
+                            type="number"
+                            min="10"
+                            max="70"
+                            step="10"
+                            value={fillBlankPercentage}
+                            onChange={(e) => {
+                              const value = Math.max(10, Math.min(70, Math.round(parseInt(e.target.value) / 10) * 10 || 10));
+                              setFillBlankPercentage(value);
+                              localStorage.setItem('fillBlankPercentage', value.toString());
+                              window.dispatchEvent(new Event('spellingSettingsChanged'));
+                            }}
+                            className="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                          <span className="ml-1 text-gray-700">%</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Easier (fewer blanks)</span>
+                        <span>Harder (more blanks)</span>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        <strong>Example:</strong> With 30% blanks, "HELLO" shows as "H_L_O" (2 out of 5 letters hidden)
                       </p>
                     </div>
                   </div>

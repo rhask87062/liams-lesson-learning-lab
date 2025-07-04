@@ -257,6 +257,29 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
 - Normalized audio volumes: letter audio at 100%, other audio at 80%
 - Created mobile version of spelling menu with simplified card layout, night sky backdrop, and animated pulsing stars while removing all floating assets
 - Simplified image handling in word list: automatically uses word.png format, shows thumbnails, allows click-to-edit images, removes manual path entry
+- Unified color palette across mobile and desktop: spelling menu uses #000000, #4B0082, #6A0DAD gradient; root menu uses dark gray to light blue gradient
+- Fixed body overflow to allow scrolling on mobile menus while keeping overflow hidden for activities that need it
+- Updated root menu gradient to dark gray → yellow → orange; added child-like text styling with crooked/backwards letters that straighten on hover
+- Added spelling game difficulty settings: max word length filter (3-15 letters) and fill-in-the-blanks percentage (10-70%)
+- Fixed aspect ratio logic that was backwards (was checking > instead of <)
+
+## Session 12 - Mobile Spelling Menu Card Width Update
+- Made mobile spelling menu cards wider with responsive sizing (60-80% of screen width)
+- Changed from fixed max-w-md to dynamic width using CSS calc: min(80%, max(60%, 100vw - 2rem))
+- Desktop cards remain unchanged
+
+## Session 12 - Audio Fix for Spelling Games
+- Fixed audio in spelling games by passing full word object to speakWord() instead of just the word string
+- Updated CopyMode and FillBlankMode to use speakWord(currentWord) instead of speakWord(currentWord.word)
+- TestMode was already correct
+- Word audio files don't exist yet (only apple.wav is defined but not present), so audio falls back to TTS
+
+## Session 12 - Audio Storage and Image Format Updates
+- Updated all words in unifiedWordDatabase to use .png format (e.g., /images/words/ant.png)
+- Discovered audio recordings are being saved as base64 in localStorage, not to public/audio directory
+- Created audioMigration.js utility to prepare for future file-based storage
+- Audio currently works via base64 data URIs stored in localStorage
+- To properly save audio files would require server-side implementation or Convex integration
 
 ## Current Status
 - Letter audio files (a.m4a through z.m4a) are in public/audio/
@@ -269,3 +292,10 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
 - Mobile layouts are scrollable except in MagicPaint
 - MagicPaint prevents touch scrolling to enable drawing gestures
 - Letter audio plays at maximum volume for consistency with word audio
+
+## Session End
+- Mobile spelling cards now responsive (60-80% width)
+- Fixed audio playback in all spelling games
+- Updated word database to use .png image format
+- Created audio migration utility for future file storage
+- Audio recordings currently stored as base64 in localStorage

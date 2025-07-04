@@ -36,6 +36,35 @@ function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [stars, setStars] = useState([]);
 
+  // Filter word list based on max word length setting
+  const [filteredWordList, setFilteredWordList] = useState(wordList);
+  
+  useEffect(() => {
+    const maxLength = parseInt(localStorage.getItem('spellingMaxWordLength') || '10');
+    const filtered = wordList.filter(word => word.word.length <= maxLength);
+    setFilteredWordList(filtered);
+    
+    // Reset word index if current word is filtered out
+    if (currentWordIndex >= filtered.length) {
+      setCurrentWordIndex(0);
+    }
+  }, [wordList, currentWordIndex]);
+
+  // Listen for spelling settings changes
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      const maxLength = parseInt(localStorage.getItem('spellingMaxWordLength') || '10');
+      const filtered = wordList.filter(word => word.word.length <= maxLength);
+      setFilteredWordList(filtered);
+      
+      // Reset to first word when settings change
+      setCurrentWordIndex(0);
+    };
+
+    window.addEventListener('spellingSettingsChanged', handleSettingsChange);
+    return () => window.removeEventListener('spellingSettingsChanged', handleSettingsChange);
+  }, [wordList]);
+
   // Initialize the auth hook. This makes the `createParentAccount` function
   // available on the window object in development mode.
   useTherapistAuth();
@@ -88,13 +117,22 @@ function App() {
   }, [currentActivity, currentMode, isNavigationLocked]);
 
   useEffect(() => {
-    // Always maintain overflow hidden to prevent unwanted scrolling
-    document.body.style.overflow = 'hidden';
+    // Only maintain overflow hidden for activities that need it (like MagicPaint)
+    // Allow scrolling for root menu and spelling menu on mobile
+    const needsOverflowHidden = currentActivity === 'magic-paint' || 
+                                currentActivity === 'letter-learner' ||
+                                currentActivity === 'matching-game';
+    
+    if (needsOverflowHidden) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
 
     const style = document.createElement('style');
     style.innerHTML = `
       .space-background {
-        background: linear-gradient(to bottom right, #000000, #4B0082, #6A0DAD);
+        background: linear-gradient(to bottom right, #000000, rgb(14, 1, 84), rgb(14, 1, 144));
         overflow: hidden;
       }
 
@@ -132,7 +170,7 @@ function App() {
       document.body.style.overflow = 'auto';
       document.head.removeChild(style);
     };
-  }, []);
+  }, [currentActivity]);
 
   useEffect(() => {
     if (currentActivity === 'spelling') {
@@ -161,7 +199,7 @@ function App() {
     }
   }, [currentActivity]);
 
-  const currentWord = wordList[currentWordIndex];
+  const currentWord = filteredWordList[currentWordIndex];
 
   // Global keyboard handler
   const handleGlobalKeyPress = (e) => {
@@ -304,7 +342,7 @@ function App() {
 
   const handleNext = () => {
     setCurrentWordIndex((prev) => {
-      const nextIndex = prev < wordList.length - 1 ? prev + 1 : 0;
+      const nextIndex = prev < filteredWordList.length - 1 ? prev + 1 : 0;
       
       if (currentMode === 'fillblank' && nextIndex % 5 === 0 && difficulty < 3) {
         setDifficulty(prev => Math.min(prev + 1, 3));

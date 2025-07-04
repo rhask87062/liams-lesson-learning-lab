@@ -5,118 +5,118 @@ import * as TTS from '../utils/simpleTTS.js';
 export const unifiedWordDatabase = {
   // Core vocabulary organized by starting letter
   A: [
-    { word: 'apple', image: '/images/words/apple.jpg', category: 'food', audioPath: '/audio/apple.wav' },
-    { word: 'ant', image: '🐜', category: 'animals' }
+    { word: 'apple', image: '/images/words/apple.png', category: 'food', audioPath: '/audio/apple.wav' },
+    { word: 'ant', image: '/images/words/ant.png', category: 'animals' }
   ],
   B: [
-    { word: 'ball', image: '/images/words/ball.jpg', category: 'toys' },
-    { word: 'banana', image: '🍌', category: 'food' }
+    { word: 'ball', image: '/images/words/ball.png', category: 'toys' },
+    { word: 'banana', image: '/images/words/banana.png', category: 'food' }
   ],
   C: [
-    { word: 'cat', image: '/images/words/cat.jpg', category: 'animals' },
-    { word: 'car', image: '/images/words/car.jpg', category: 'toys' }
+    { word: 'cat', image: '/images/words/cat.png', category: 'animals' },
+    { word: 'car', image: '/images/words/car.png', category: 'toys' }
   ],
   D: [
-    { word: 'dog', image: '/images/words/dog.jpg', category: 'animals' },
-    { word: 'duck', image: '🦆', category: 'animals' }
+    { word: 'dog', image: '/images/words/dog.png', category: 'animals' },
+    { word: 'duck', image: '/images/words/duck.png', category: 'animals' }
   ],
   E: [
-    { word: 'elephant', image: '🐘', category: 'animals' },
-    { word: 'egg', image: '🥚', category: 'food' },
-    { word: 'eleven', image: '1️⃣1️⃣', category: 'numbers' },
-    { word: 'eighteen', image: '1️⃣8️⃣', category: 'numbers' }
+    { word: 'elephant', image: '/images/words/elephant.png', category: 'animals' },
+    { word: 'egg', image: '/images/words/egg.png', category: 'food' },
+    { word: 'eleven', image: '/images/words/eleven.png', category: 'numbers' },
+    { word: 'eighteen', image: '/images/words/eighteen.png', category: 'numbers' }
   ],
   F: [
-    { word: 'fish', image: '🐟', category: 'animals' },
-    { word: 'frog', image: '🐸', category: 'animals' },
-    { word: 'fourteen', image: '1️⃣4️⃣', category: 'numbers' },
-    { word: 'fifteen', image: '1️⃣5️⃣', category: 'numbers' }
+    { word: 'fish', image: '/images/words/fish.png', category: 'animals' },
+    { word: 'frog', image: '/images/words/frog.png', category: 'animals' },
+    { word: 'fourteen', image: '/images/words/fourteen.png', category: 'numbers' },
+    { word: 'fifteen', image: '/images/words/fifteen.png', category: 'numbers' }
   ],
   G: [
-    { word: 'giraffe', image: '🦒', category: 'animals' },
-    { word: 'goat', image: '🐐', category: 'animals' }
+    { word: 'giraffe', image: '/images/words/giraffe.png', category: 'animals' },
+    { word: 'goat', image: '/images/words/goat.png', category: 'animals' }
   ],
   H: [
-    { word: 'horse', image: '🐴', category: 'animals' },
-    { word: 'hat', image: '👒', category: 'clothes' }
+    { word: 'horse', image: '/images/words/horse.png', category: 'animals' },
+    { word: 'hat', image: '/images/words/hat.png', category: 'clothes' }
   ],
   I: [
-    { word: 'ice cream', image: '🍦', category: 'food' },
-    { word: 'igloo', image: '🏔️', category: 'places' }
+    { word: 'ice cream', image: '/images/words/ice cream.png', category: 'food' },
+    { word: 'igloo', image: '/images/words/igloo.png', category: 'places' }
   ],
   J: [
-    { word: 'jellyfish', image: '🪼', category: 'animals' },
-    { word: 'juice', image: '🧃', category: 'food' }
+    { word: 'jellyfish', image: '/images/words/jellyfish.png', category: 'animals' },
+    { word: 'juice', image: '/images/words/juice.png', category: 'food' }
   ],
   K: [
-    { word: 'kite', image: '🪁', category: 'toys' },
-    { word: 'kangaroo', image: '🦘', category: 'animals' }
+    { word: 'kite', image: '/images/words/kite.png', category: 'toys' },
+    { word: 'kangaroo', image: '/images/words/kangaroo.png', category: 'animals' }
   ],
   L: [
-    { word: 'lion', image: '🦁', category: 'animals' },
-    { word: 'lemon', image: '🍋', category: 'food' }
+    { word: 'lion', image: '/images/words/lion.png', category: 'animals' },
+    { word: 'lemon', image: '/images/words/lemon.png', category: 'food' }
   ],
   M: [
-    { word: 'monkey', image: '🐵', category: 'animals' },
-    { word: 'moon', image: '🌙', category: 'nature' }
+    { word: 'monkey', image: '/images/words/monkey.png', category: 'animals' },
+    { word: 'moon', image: '/images/words/moon.png', category: 'nature' }
   ],
   N: [
-    { word: 'nest', image: '🪺', category: 'nature' },
-    { word: 'nose', image: '��', category: 'body' },
-    { word: 'nineteen', image: '1️⃣9️⃣', category: 'numbers' }
+    { word: 'nest', image: '/images/words/nest.png', category: 'nature' },
+    { word: 'nose', image: '/images/words/nose.png', category: 'body' },
+    { word: 'nineteen', image: '/images/words/nineteen.png', category: 'numbers' }
   ],
   O: [
-    { word: 'orange', image: '🍊', category: 'food' },
-    { word: 'owl', image: '🦉', category: 'animals' }
+    { word: 'orange', image: '/images/words/orange.png', category: 'food' },
+    { word: 'owl', image: '/images/words/owl.png', category: 'animals' }
   ],
   P: [
-    { word: 'penguin', image: '🐧', category: 'animals' },
-    { word: 'pizza', image: '🍕', category: 'food' }
+    { word: 'penguin', image: '/images/words/penguin.png', category: 'animals' },
+    { word: 'pizza', image: '/images/words/pizza.png', category: 'food' }
   ],
   Q: [
-    { word: 'queen', image: '👸', category: 'people' },
-    { word: 'quilt', image: '🛏️', category: 'objects' }
+    { word: 'queen', image: '/images/words/queen.png', category: 'people' },
+    { word: 'quilt', image: '/images/words/quilt.png', category: 'objects' }
   ],
   R: [
-    { word: 'rabbit', image: '🐰', category: 'animals' },
-    { word: 'rainbow', image: '🌈', category: 'nature' }
+    { word: 'rabbit', image: '/images/words/rabbit.png', category: 'animals' },
+    { word: 'rainbow', image: '/images/words/rainbow.png', category: 'nature' }
   ],
   S: [
-    { word: 'sun', image: '☀️', category: 'nature' },
-    { word: 'snake', image: '🐍', category: 'animals' },
-    { word: 'sixteen', image: '1️⃣6️⃣', category: 'numbers' },
-    { word: 'seventeen', image: '1️⃣7️⃣', category: 'numbers' }
+    { word: 'sun', image: '/images/words/sun.png', category: 'nature' },
+    { word: 'snake', image: '/images/words/snake.png', category: 'animals' },
+    { word: 'sixteen', image: '/images/words/sixteen.png', category: 'numbers' },
+    { word: 'seventeen', image: '/images/words/seventeen.png', category: 'numbers' }
   ],
   T: [
-    { word: 'tree', image: '🌳', category: 'nature' },
-    { word: 'tiger', image: '🐅', category: 'animals' },
-    { word: 'twelve', image: '1️⃣2️⃣', category: 'numbers' },
-    { word: 'thirteen', image: '1️⃣3️⃣', category: 'numbers' },
-    { word: 'twenty', image: '2️⃣0️⃣', category: 'numbers' }
+    { word: 'tree', image: '/images/words/tree.png', category: 'nature' },
+    { word: 'tiger', image: '/images/words/tiger.png', category: 'animals' },
+    { word: 'twelve', image: '/images/words/twelve.png', category: 'numbers' },
+    { word: 'thirteen', image: '/images/words/thirteen.png', category: 'numbers' },
+    { word: 'twenty', image: '/images/words/twenty.png', category: 'numbers' }
   ],
   U: [
-    { word: 'umbrella', image: '☂️', category: 'objects' },
-    { word: 'unicorn', image: '🦄', category: 'fantasy' }
+    { word: 'umbrella', image: '/images/words/umbrella.png', category: 'objects' },
+    { word: 'unicorn', image: '/images/words/unicorn.png', category: 'fantasy' }
   ],
   V: [
-    { word: 'violin', image: '🎻', category: 'music' },
-    { word: 'van', image: '🚐', category: 'vehicles' }
+    { word: 'violin', image: '/images/words/violin.png', category: 'music' },
+    { word: 'van', image: '/images/words/van.png', category: 'vehicles' }
   ],
   W: [
-    { word: 'whale', image: '🐋', category: 'animals' },
-    { word: 'watermelon', image: '🍉', category: 'food' }
+    { word: 'whale', image: '/images/words/whale.png', category: 'animals' },
+    { word: 'watermelon', image: '/images/words/watermelon.png', category: 'food' }
   ],
   X: [
-    { word: 'xylophone', image: '🎵', category: 'music' },
-    { word: 'x-ray', image: '🩻', category: 'medical' }
+    { word: 'xylophone', image: '/images/words/xylophone.png', category: 'music' },
+    { word: 'x-ray', image: '/images/words/x-ray.png', category: 'medical' }
   ],
   Y: [
-    { word: 'yak', image: '🐂', category: 'animals' },
-    { word: 'yo-yo', image: '🪀', category: 'toys' }
+    { word: 'yak', image: '/images/words/yak.png', category: 'animals' },
+    { word: 'yo-yo', image: '/images/words/yo-yo.png', category: 'toys' }
   ],
   Z: [
-    { word: 'zebra', image: '🦓', category: 'animals' },
-    { word: 'zoo', image: '🦁', category: 'places' }
+    { word: 'zebra', image: '/images/words/zebra.png', category: 'animals' },
+    { word: 'zoo', image: '/images/words/zoo.png', category: 'places' }
   ],
   // Numbers
   '0': [{ word: 'zero', image: '0️⃣', category: 'numbers' }],

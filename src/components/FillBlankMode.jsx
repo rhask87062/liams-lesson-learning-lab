@@ -20,25 +20,51 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
     setShowFeedback(false);
   }, [currentWord, difficulty]);
 
+  // Listen for spelling settings changes
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      if (currentWord) {
+        generateBlankedWord();
+        setUserInput('');
+        setIsCorrect(null);
+        setShowFeedback(false);
+      }
+    };
+
+    window.addEventListener('spellingSettingsChanged', handleSettingsChange);
+    return () => window.removeEventListener('spellingSettingsChanged', handleSettingsChange);
+  }, [currentWord]);
+
   const generateBlankedWord = () => {
     if (!currentWord) return;
     
     const word = currentWord.word.toLowerCase();
     const wordLength = word.length;
     
-    // For fill-in-the-blank mode, we only blank out 1 letter at a time
-    // This makes it appropriate for young children learning letters
-    const numBlanks = 1;
+    // Get fill blank percentage from settings
+    const percentage = parseInt(localStorage.getItem('fillBlankPercentage') || '30');
     
-    // Select random position to blank out
-    const blankPosition = Math.floor(Math.random() * wordLength);
+    // Calculate number of blanks based on percentage
+    let numBlanks = Math.round((wordLength * percentage) / 100);
+    // Ensure at least 1 blank and not more than the word length
+    numBlanks = Math.max(1, Math.min(numBlanks, wordLength));
     
-    // Create blanked word and track missing letter
+    // Select random positions to blank out
+    const positions = [];
+    const availablePositions = Array.from({ length: wordLength }, (_, i) => i);
+    
+    for (let i = 0; i < numBlanks; i++) {
+      const randomIndex = Math.floor(Math.random() * availablePositions.length);
+      positions.push(availablePositions[randomIndex]);
+      availablePositions.splice(randomIndex, 1);
+    }
+    
+    // Create blanked word and track missing letters
     let blanked = '';
     const missing = [];
     
     for (let i = 0; i < wordLength; i++) {
-      if (i === blankPosition) {
+      if (positions.includes(i)) {
         blanked += '_';
         missing.push({ position: i, letter: word[i] });
       } else {
@@ -53,15 +79,15 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
   if (!currentWord) return null;
 
   const handleSpeak = async () => {
-    await speakWord(currentWord.word);
+    await speakWord(currentWord);
   };
 
   const checkAnswer = async () => {
-    // For single letter input, check if the user typed the correct missing letter
-    const expectedLetter = missingLetters[0]?.letter.toLowerCase();
-    const userLetter = userInput.toLowerCase().trim();
+    // For multiple letter input, check if the user typed all the missing letters in order
+    const expectedLetters = missingLetters.map(ml => ml.letter).join('').toLowerCase();
+    const userLetters = userInput.toLowerCase().trim();
     
-    const correct = userLetter === expectedLetter;
+    const correct = userLetters === expectedLetters;
     setIsCorrect(correct);
     setShowFeedback(true);
     
@@ -81,9 +107,9 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
   };
 
   const handleInputChange = (e) => {
-    // Only allow single letter input
+    // Allow input up to the number of missing letters
     const value = e.target.value;
-    if (value.length <= 1 && /^[a-zA-Z]*$/.test(value)) {
+    if (value.length <= missingLetters.length && /^[a-zA-Z]*$/.test(value)) {
       setUserInput(value);
       setShowFeedback(false);
       setIsCorrect(null);
@@ -191,15 +217,20 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
             ))}
           </div>
           
-          {/* Input field - smaller for single letter */}
+          {/* Input field - sized based on number of missing letters */}
           <input
             type="text"
             value={userInput}
             onChange={handleInputChange}
             onKeyDown={handleKeyPress}
-            className="text-4xl md:text-6xl font-bold text-center p-4 md:p-6 border-4 border-gray-300 rounded-xl w-20 md:w-24 mx-auto focus:border-yellow-500 focus:outline-none tablet-input keyboard-focus"
-            placeholder="?"
-            maxLength="1"
+            className={`text-4xl md:text-6xl font-bold text-center p-4 md:p-6 border-4 border-gray-300 rounded-xl mx-auto focus:border-yellow-500 focus:outline-none tablet-input keyboard-focus ${
+              missingLetters.length === 1 ? 'w-20 md:w-24' : 
+              missingLetters.length === 2 ? 'w-32 md:w-40' :
+              missingLetters.length === 3 ? 'w-48 md:w-56' :
+              'w-64 md:w-72'
+            }`}
+            placeholder={missingLetters.map(() => '?').join('')}
+            maxLength={missingLetters.length}
             autoFocus
             tabIndex={1}
           />
@@ -214,7 +245,7 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
               </div>
               {!isCorrect && (
                 <p className="text-lg md:text-xl text-gray-600 mt-2">
-                  The missing letter is: <strong>{missingLetters[0]?.letter.toUpperCase()}</strong>
+                  The missing letters are: <strong>{missingLetters.map(ml => ml.letter.toUpperCase()).join(', ')}</strong>
                 </p>
               )}
             </div>
