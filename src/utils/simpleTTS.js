@@ -48,6 +48,12 @@ export const speak = async (text, { audioPath = null, rate = 1, pitch = 1, volum
         audio.type = 'audio/mp4';
       }
       
+      // Create a promise to handle audio loading
+      const audioLoadPromise = new Promise((resolve, reject) => {
+        audio.addEventListener('canplaythrough', () => resolve(), { once: true });
+        audio.addEventListener('error', (e) => reject(e), { once: true });
+      });
+      
       // Boost volume for letter audio files
       if (audioPath.includes('/audio/') && audioPath.match(/\/[a-z]\.m4a$/)) {
         // Use Web Audio API to amplify letter audio beyond normal limits
@@ -67,13 +73,19 @@ export const speak = async (text, { audioPath = null, rate = 1, pitch = 1, volum
         audio.volume = 0.8; // Normal volume for other audio
       }
       
+      // Wait for audio to be ready before playing
+      await audioLoadPromise;
+      
       currentAudio = audio;
       await audio.play();
       if (onend) audio.onended = onend;
       return; // Exit if custom audio succeeded
     } catch (error) {
-      console.warn('Failed to play custom audio, falling back to other methods.', error);
-      // Continue to fallback methods
+      console.warn('Failed to play custom audio, but NOT falling back to TTS since custom audio was provided.', error);
+      // If custom audio was explicitly provided but failed, don't fall back to TTS
+      // This prevents both TTS and recorded audio from playing
+      if (onend) onend();
+      return;
     }
   }
 
