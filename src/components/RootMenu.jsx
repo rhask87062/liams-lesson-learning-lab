@@ -15,7 +15,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'spelling',
       title: 'Spelling Games',
       asset: telescope,
-      position: 'absolute left-[25%] bottom-[35%]',
+      position: 'absolute left-[25%] bottom-[30%]',
       size: 'w-[30%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#FBBF24]', // Yellow glow to match text-yellow-500
       labelColor: 'text-yellow-500',
@@ -28,7 +28,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'matching-game',
       title: 'Matching Game',
       asset: microscope,
-      position: 'absolute left-[-35%] bottom-[35%]',
+      position: 'absolute left-[-35%] bottom-[30%]',
       size: 'w-[20%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#3B82F6]', // Blue glow to match text-blue-500
       labelColor: 'text-blue-500',
@@ -41,7 +41,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'magic-paint',
       title: 'Magic Paint',
       asset: computer,
-      position: 'absolute right-[-20%] bottom-[34%]',
+      position: 'absolute right-[-20%] bottom-[28%]',
       size: 'w-[25%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#10B981]', // Green glow to match text-green-500
       labelColor: 'text-green-500',
@@ -54,7 +54,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'letter-learner',
       title: 'Letter Learner',
       asset: fossil,
-      position: 'absolute left-[-10%] bottom-[37%]',
+      position: 'absolute left-[0%] bottom-[30%]',
       size: 'w-[20%] h-auto',
       glow: 'group-hover:drop-shadow-[0_0_15px_#F97316]', // Orange glow to match text-orange-500
       labelColor: 'text-orange-500',
@@ -233,7 +233,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
         }
       `}</style>
       <div 
-        className="flex items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden"
+        className="flex items-center justify-center min-h-screen p-4 md:p-8 relative"
       >
         {/* Background Image Container */}
         <div 
@@ -296,33 +296,25 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
           {activities.map((activity) => (
             <div
               key={activity.id}
-              className={`${activity.position} group cursor-pointer flex flex-col items-center`}
-              onClick={() => onSelectActivity(activity.id)}
-              style={{
-                // Fix hit box alignment for negative positioning
-                pointerEvents: 'auto',
-                zIndex: 10
-              }}
+              className={`${activity.position} group flex flex-col items-center`}
             >
               {/* Activity Asset */}
-              <div className={`${activity.size} ${activity.hoverTransform} transition-all duration-300 relative`}>
+              <div
+                className={`${activity.size} ${activity.hoverTransform} transition-all duration-300 cursor-pointer`}
+                onClick={() => onSelectActivity(activity.id)}
+              >
                 <img 
                   src={activity.asset} 
                   alt={activity.title}
                   className={`w-full h-full object-contain ${activity.glow} transition-all duration-300`}
                 />
-                {/* Expanded hit area overlay */}
-                <div 
-                  className="absolute inset-0 -m-4 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectActivity(activity.id);
-                  }}
-                />
               </div>
               
               {/* Activity Label - positioned below the asset */}
-              <div className={`${activity.labelGap} opacity-80 group-hover:opacity-100 transition-opacity duration-300`}>
+              <div
+                className={`${activity.labelGap} opacity-80 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer`}
+                onClick={() => onSelectActivity(activity.id)}
+              >
                 <div className={`${activity.labelColor} ${activity.hoverTextColor} ${activity.textGlow} text-[1.2vw] font-black whitespace-nowrap text-center transition-all duration-300`} style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
                   {activity.title.split('').map((char, i) => (
                     <span key={i} className="child-text">

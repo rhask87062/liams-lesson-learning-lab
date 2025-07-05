@@ -116,7 +116,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           {/* Stars background */}
           <div className="fixed inset-0 overflow-hidden pointer-events-none">
             {Array.from({ length: 50 }, (_, i) => (
-              <div
+              <div>
                 key={i}
                 className="absolute animate-pulse-glow celestial-glow"
                 style={{
@@ -126,8 +126,8 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
                   animationDelay: `${Math.random() * 3}s`,
                   animationDuration: `${Math.random() * 2 + 3}s`
                 }}
-              >
-                ⭐
+              
+                
               </div>
             ))}
           </div>
@@ -180,19 +180,19 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
       <style>{`
         @keyframes cow-drift {
           0% {
-            transform: translateX(0) translateY(0) rotate(0deg);
+            transform: translate(0, 0) rotate(-10deg);
           }
           25% {
-            transform: translateX(-30px) translateY(-20px) rotate(15deg);
+            transform: translate(-4px, -6px) rotate(0deg);
           }
           50% {
-            transform: translateX(-50px) translateY(10px) rotate(-10deg);
+            transform: translate(0px, 5px) rotate(10deg);
           }
           75% {
-            transform: translateX(-20px) translateY(30px) rotate(5deg);
+            transform: translate(4px, -6px) rotate(0deg);
           }
           100% {
-            transform: translateX(0) translateY(0) rotate(0deg);
+            transform: translate(0, 0) rotate(-10deg);
           }
         }
         .animate-cow-drift {
@@ -291,42 +291,42 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         @keyframes ufo-hover {
           0% {
             transform: translate(0, 0) rotate(0deg);
-            filter: drop-shadow(0px 0px 8px hsl(0, 100%, 70%)); /* Adjusted shadow for edge glow */
+            filter: drop-shadow(3px 2px 10px hsl(0, 100%, 70%));
           }
           10% {
-            transform: translate(5px, -10px) rotate(5deg);
+            transform: translate(5px, -20px) rotate(5deg);
           }
           20% {
-            transform: translate(-10px, 0px) rotate(-5deg);
+            transform: translate(-10px, 10px) rotate(-5deg);
           }
           30% {
-            transform: translate(0px, 10px) rotate(0deg);
-            filter: drop-shadow(0px 0px 12px hsl(60, 100%, 70%)); /* Adjusted shadow for edge glow */
+            transform: translate(0px, 30px) rotate(0deg);
+            filter: drop-shadow(5px -2px 20px hsl(60, 100%, 70%));
           }
           40% { /* Darting action */
-            transform: translate(50px, -30px) rotate(15deg);
+            transform: translate(15px, -50px) rotate(15deg);
           }
           50% {
-            transform: translate(20px, 20px) rotate(-10deg);
-            filter: drop-shadow(0px 0px 8px hsl(120, 100%, 70%)); /* Adjusted shadow for edge glow */
+            transform: translate(0px, 40px) rotate(-10deg);
+            filter: drop-shadow(-4px 2px 8px hsl(120, 100%, 70%));
           }
           60% {
-            transform: translate(-20px, -20px) rotate(10deg);
+            transform: translate(-15px, -30px) rotate(10deg);
           }
           70% {
-            transform: translate(10px, 0px) rotate(-5deg);
-            filter: drop-shadow(0px 0px 12px hsl(180, 100%, 70%)); /* Adjusted shadow for edge glow */
+            transform: translate(10px, 10px) rotate(-5deg);
+            filter: drop-shadow(3px 0px 12px hsl(180, 100%, 70%));
           }
           80% { /* Darting action */
-            transform: translate(-90px, 30px) rotate(-15deg);
+            transform: translate(-20px, 50px) rotate(-15deg);
           }
           90% {
-            transform: translate(0px, -5px) rotate(5deg);
-            filter: drop-shadow(0px 0px 8px hsl(290, 100%, 70%)); /* Adjusted shadow for edge glow */
+            transform: translate(0px, -15px) rotate(5deg);
+            filter: drop-shadow(-5px 0px 8px hsl(290, 100%, 70%));
           }
           100% {
             transform: translate(0, 0) rotate(0deg);
-            filter: drop-shadow(0px 0px 10px hsl(300, 100%, 70%)); /* Adjusted shadow for edge glow */
+            filter: drop-shadow(3px 2px 10px hsl(300, 100%, 70%));
           }
         }
         .animate-ufo-hover {
@@ -344,13 +344,13 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         {/* Space Adventure themed background elements with proper z-index layering */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Jupiter - furthest back after stars */}
-          <div className="absolute bottom-1/3 left-1/8 text-5xl z-[1]">🪐</div>
+          <div className="absolute bottom-1/6 left-1/100 text-5xl z-[1]">🪐</div>
           
           {/* Moon - second furthest back */}
           <img 
             src={moon} 
             alt="Moon" 
-            className="absolute top-1/5 left-1/5 w-16 h-16 md:w-20 md:h-20 animate-gentle-rock celestial-glow z-[2]" 
+            className="absolute top-1/20 left-1/20 w-16 h-16 md:w-20 md:h-20 animate-gentle-rock celestial-glow z-[2]" 
           />
           
           {/* Mid-range objects */}
