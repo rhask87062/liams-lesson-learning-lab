@@ -342,7 +342,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         tabIndex={0}
       >
         {/* Space Adventure themed background elements with proper z-index layering */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none">
           {/* Jupiter - furthest back after stars */}
           <div className="absolute bottom-1/6 left-1/100 text-5xl z-[1]">🪐</div>
           
@@ -357,12 +357,12 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={meteor} 
             alt="Meteor" 
-            className={`absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 z-[5] opacity-0 ${animateItems.meteor ? 'animate-fly-by' : ''}`}
+            className={`absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 z-[5] ${animateItems.meteor ? 'animate-fly-by' : ''}`}
           />
           <img 
             src={satellite} 
             alt="Satellite" 
-            className={`absolute top-1/5 left-1/2 w-10 h-10 md:w-12 md:h-12 z-[6] opacity-0 ${animateItems.satellite ? 'animate-satellite-pass' : ''}`}
+            className={`absolute top-1/5 left-1/2 w-10 h-10 md:w-12 md:h-12 z-[6] ${animateItems.satellite ? 'animate-satellite-pass' : ''}`}
           />
           
           {/* Foreground objects */}
@@ -374,7 +374,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={rocket} 
             alt="Rocket" 
-            className={`absolute top-10 left-90 w-12 h-12 md:w-16 md:h-16 opacity-0 z-[8] ${animateItems.rocket ? 'animate-rocket-fly-by' : ''}`}
+            className={`absolute top-10 left-[90%] w-12 h-12 md:w-16 md:h-16 z-[8] ${animateItems.rocket ? 'animate-rocket-fly-by' : ''}`}
           />
         </div>
         {/* Home button - top right */}
