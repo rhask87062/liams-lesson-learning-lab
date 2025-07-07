@@ -233,6 +233,12 @@
 - ✅ **Fixed microscope item floating animation (removed rotation, slowed movement)**
 - ✅ **Added word list editing to Curriculum Settings**
 
+### Current Session: UI Enhancements & Feature Planning ✅
+- ✅ **Mobile/Desktop Layout Logic**: Refined `useIsMobile` hook to use a standard 768px breakpoint for a clear phone vs. tablet/desktop distinction.
+- ✅ **Spelling Menu Animations Fix**: Resolved issue with static rocket, satellite, and meteor by ensuring correct `animation-fill-mode: backwards;` and resolving transform conflicts, making them animate properly.
+- ✅ **Browser Tab Name & Icon Fix**: Corrected the browser tab title to "Liam's Lesson Learning Lab" and ensured `favicon.png` displays correctly by addressing caching.
+- ✅ **Flash Cards Game Concept Documented**: Detailed plans for a new Flash Cards game with progressive difficulty levels (Easy, Medium, Hard, Hardest) and celebration particle/audio effects (confetti, fireworks, clap tracks).
+
 ### Previous Session (Hover Area Enhancement)
 - ✅ **Hover Area Fix**: Resolved issue where lab asset hover effects only triggered on label text, not entire asset area
 - ✅ **Accessibility Enhancement**: Replaced Button components with keyboard-navigable divs including tabIndex and onKeyDown handlers

@@ -8,7 +8,7 @@ import meteor from '../assets/spelling-menu/meteor.png';
 import ufo from '../assets/spelling-menu/ufo.png';
 import cow from '../assets/spelling-menu/cow.png';
 import rocket from '../assets/spelling-menu/rocket.png';
-import satellite from '../assets/satellite.png'; // Import satellite.png
+import satellite from '../assets/spelling-menu/satellite.png'; // Import satellite.png
 
 const SpellingMenu = ({ onSelectMode, onHome }) => {
   const isMobile = useIsMobile();
@@ -116,7 +116,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           {/* Stars background */}
           <div className="fixed inset-0 overflow-hidden pointer-events-none">
             {Array.from({ length: 50 }, (_, i) => (
-              <div>
+              <div
                 key={i}
                 className="absolute animate-pulse-glow celestial-glow"
                 style={{
@@ -126,8 +126,8 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
                   animationDelay: `${Math.random() * 3}s`,
                   animationDuration: `${Math.random() * 2 + 3}s`
                 }}
-              
-                
+              >
+                ⭐
               </div>
             ))}
           </div>
@@ -212,58 +212,36 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
         // Animation for the Satellite asset on the Spelling Menu app
         @keyframes satellite-pass {
           0% {
-            transform: translate(-50vw, 20vh) rotate(-15deg);
-            opacity: 0;
+            transform: translate(-100vw, 0);
           }
           100% {
-            transform: translate(150vw, 20vh) rotate(345deg);
-            opacity: 0;
+            transform: translate(100vw, 0);
           }
         }
         .animate-satellite-pass {
-          animation: satellite-pass 50s linear infinite;
+          animation: satellite-pass 30s linear infinite;
           animation-fill-mode: backwards;
         }
         // Animation for the Meteor asset on the Spelling Menu app
         @keyframes fly-by {
           0% {
-            transform: translate(-150vw, 150vh) scale(0.6) rotate(-45deg);
-            opacity: 0;
-          }
-          25% {
-            transform: translate(0vw, 100vh) scale(1) rotate(-45deg);
-            opacity: 1;
-          }
-          75% {
-            transform: translate(100vw, -0vh) scale(1) rotate(-45deg);
-            opacity: 1;
+            transform: translate(0, 0);
           }
           100% {
-            transform: translate(250vw, -50vh) scale(0.6) rotate(-45deg);
-            opacity: 0;
+            transform: translate(200vw, -200vh);
           }
         }
         .animate-fly-by {
-          animation: fly-by 20s linear infinite;
+          animation: fly-by 15s linear infinite;
           animation-fill-mode: backwards;
         }
         // Animation for the Rocket asset on the Spelling Menu app
         @keyframes rocket-fly-by {
             0% {
-                transform: translate(-50vw, 150vh) scale(0.6) rotate(45deg);
-                opacity: 0;
-            }
-            25% {
-                transform: translate(0vw, 100vh) scale(1) rotate(45deg);
-                opacity: 1;
-            }
-            75% {
-                transform: translate(100vw, 0vh) scale(1) rotate(45deg);
-                opacity: 1;
+                transform: translate(0, 0);
             }
             100% {
-                transform: translate(150vw, -50vh) scale(0.6) rotate(45deg);
-                opacity: 0;
+                transform: translate(-150vw, -150vh);
             }
         }
         .animate-rocket-fly-by {
@@ -357,12 +335,12 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={meteor} 
             alt="Meteor" 
-            className={`absolute top-0 right-20 w-10 h-10 md:w-12 md:h-12 z-[5] ${animateItems.meteor ? 'animate-fly-by' : ''}`}
+            className={`absolute top-[100vh] left-[-50vw] w-10 h-10 md:w-12 md:h-12 z-[5] transform scale-75 -rotate-45 ${animateItems.meteor ? 'animate-fly-by' : 'opacity-0'}`}
           />
           <img 
             src={satellite} 
             alt="Satellite" 
-            className={`absolute top-1/5 left-1/2 w-10 h-10 md:w-12 md:h-12 z-[6] ${animateItems.satellite ? 'animate-satellite-pass' : ''}`}
+            className={`absolute top-[20vh] left-0 w-10 h-10 md:w-12 md:h-12 z-[6] transform -rotate-15 ${animateItems.satellite ? 'animate-satellite-pass' : 'opacity-0'}`}
           />
           
           {/* Foreground objects */}
@@ -374,7 +352,7 @@ const SpellingMenu = ({ onSelectMode, onHome }) => {
           <img 
             src={rocket} 
             alt="Rocket" 
-            className={`absolute top-10 left-[90%] w-12 h-12 md:w-16 md:h-16 z-[8] ${animateItems.rocket ? 'animate-rocket-fly-by' : ''}`}
+            className={`absolute top-[80vh] left-[20vw] w-12 h-12 md:w-16 md:h-16 z-[8] transform rotate-45 scale-75 ${animateItems.rocket ? 'animate-rocket-fly-by' : 'opacity-0'}`}
           />
         </div>
         {/* Home button - top right */}

@@ -1,7 +1,7 @@
 {
-  "name": "Kids Spelling App",
-  "short_name": "SpellingApp",
-  "description": "A fun spelling and reading app for children",
+  "name": "Liam's Lesson Learning Lab",
+  "short_name": "L4",
+  "description": "A fun learning app for children",
   "start_url": "/",
   "display": "fullscreen",
   "background_color": "#ffffff",

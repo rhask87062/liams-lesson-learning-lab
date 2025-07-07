@@ -1,33 +1,26 @@
 import * as React from "react"
 
-// Switch to mobile when width < 1200px OR aspect ratio < 1.33 (narrower than 4:3)
-// This prevents the lab background from being cut off
-const WIDTH_BREAKPOINT = 1200
-const ASPECT_RATIO_THRESHOLD = 1.33 // 4:3 ratio (1200/900)
+// A simple, standard breakpoint for mobile devices.
+// Anything <= 768px is considered a phone.
+// Anything > 768px is considered a tablet or desktop.
+const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState(undefined)
 
   React.useEffect(() => {
-    const checkMobile = () => {
+    const checkIsPhone = () => {
       const width = window.innerWidth
-      const height = window.innerHeight
-      const aspectRatio = width / height
-      
-      // Switch to mobile if:
-      // 1. Width is less than 1200px OR
-      // 2. Aspect ratio is less than 4:3 (taller/narrower screens)
-      const shouldBeMobile = width < WIDTH_BREAKPOINT || aspectRatio < ASPECT_RATIO_THRESHOLD
-      setIsMobile(shouldBeMobile)
+      setIsMobile(width <= MOBILE_BREAKPOINT)
     }
 
     // Initial check
-    checkMobile()
+    checkIsPhone()
 
     // Listen for resize events
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    window.addEventListener('resize', checkIsPhone)
+    return () => window.removeEventListener('resize', checkIsPhone)
   }, [])
 
-  return !!isMobile
+  return isMobile
 }

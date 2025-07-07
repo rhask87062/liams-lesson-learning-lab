@@ -244,6 +244,7 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
 - Responsive layout for mobile vs desktop
 - Mobile scrolling and touch handling
 - Audio volume normalization
+- Flash Cards game development
 
 ## Recent Changes
 - Added audio recording functionality to word list management with MediaRecorder API, Base64 conversion, and preview playback
@@ -262,6 +263,11 @@ Successfully transformed the RootMenu into an immersive lab experience with inte
 - Updated root menu gradient to dark gray → yellow → orange; added child-like text styling with crooked/backwards letters that straighten on hover
 - Added spelling game difficulty settings: max word length filter (3-15 letters) and fill-in-the-blanks percentage (10-70%)
 - Fixed aspect ratio logic that was backwards (was checking > instead of <)
+- **Desktop Layout Responsive Positioning Fix**: Converted all activity positions to percentage-based for responsive scaling; items now stay on lab counter at all aspect ratios.
+- **Hitbox Alignment Fix**: Restored original visual layout and fixed hitboxes by attaching `onClick` event directly to the image and label containers, removed conflicting `overflow-hidden` from parent, and removed hardcoded `opacity-0` from image elements within animations.
+- **Spelling Menu Animations**: Refined cow drift for subtle movement; ensured rocket, satellite, and meteor animations now move across the screen by correcting keyframes and re-adding `animation-fill-mode: backwards;`.
+- **Browser Tab Name & Icon**: Confirmed correct display of "Liam's Lesson Learning Lab" and `favicon.png` after hard refresh, resolving caching issue.
+- **Mobile/Desktop Layout Switch**: Simplified `useIsMobile` hook to use a standard 768px breakpoint for clear distinction between phones and tablets/desktops.
 
 ## Session 12 - Mobile Spelling Menu Card Width Update
 - Made mobile spelling menu cards wider with responsive sizing (60-80% of screen width)
