@@ -84,6 +84,7 @@ Root Menu → Activity Selection → Learning Modes → Progress Tracking
 🟡 **Yellow**: Testing coverage and automated validation  
 🟡 **Yellow**: Performance optimization and monitoring  
 🔴 **Red**: Comprehensive documentation beyond memory bank  
+✅ **Flash Cards Game Concept Documented**: Detailed plans for a new Flash Cards game with progressive difficulty levels (Easy, Medium, Hard, Hardest) and celebration particle/audio effects (confetti, fireworks, clap tracks), with difficulty settings integrated into the parent/teacher portal's curriculum tab.
 
 ## Current Session Changes
 
