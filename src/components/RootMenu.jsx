@@ -15,11 +15,9 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'spelling',
       title: 'Spelling Games',
       asset: telescope,
-      position: 'absolute left-[25%] bottom-[30%]',
-      size: 'w-[30%] h-auto',
+      scene: { x: 66.7, base: 41.7, w: 12.5 },
       glow: 'group-hover:drop-shadow-[0_0_15px_#FBBF24]', // Yellow glow to match text-yellow-500
       labelColor: 'text-yellow-500',
-      labelGap: 'mt-0',
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#FBBF24]',
       hoverTransform: 'group-hover:-translate-y-2', // 2px up for spelling
       hoverTextColor: 'group-hover:text-yellow-300' // Brighter yellow
@@ -28,11 +26,9 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'matching-game',
       title: 'Matching Game',
       asset: microscope,
-      position: 'absolute left-[-35%] bottom-[30%]',
-      size: 'w-[20%] h-auto',
+      scene: { x: 43.0, base: 43.2, w: 7.8 },
       glow: 'group-hover:drop-shadow-[0_0_15px_#3B82F6]', // Blue glow to match text-blue-500
       labelColor: 'text-blue-500',
-      labelGap: 'mt-0',
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#3B82F6]',
       hoverTransform: 'group-hover:-translate-y-2', // 2px up for matching
       hoverTextColor: 'group-hover:text-blue-300' // Brighter blue
@@ -41,11 +37,9 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'magic-paint',
       title: 'Magic Paint',
       asset: computer,
-      position: 'absolute right-[-20%] bottom-[28%]',
-      size: 'w-[25%] h-auto',
+      scene: { x: 81.6, base: 40.7, w: 12.3 },
       glow: 'group-hover:drop-shadow-[0_0_15px_#10B981]', // Green glow to match text-green-500
       labelColor: 'text-green-500',
-      labelGap: 'mt-0',
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#10B981]',
       hoverTransform: 'group-hover:-translate-y-2', // 2px up for magic paint
       hoverTextColor: 'group-hover:text-green-300' // Brighter green
@@ -54,11 +48,9 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
       id: 'letter-learner',
       title: 'Letter Learner',
       asset: fossil,
-      position: 'absolute left-[0%] bottom-[30%]',
-      size: 'w-[20%] h-auto',
+      scene: { x: 53.6, base: 42.5, w: 8.4 },
       glow: 'group-hover:drop-shadow-[0_0_15px_#F97316]', // Orange glow to match text-orange-500
       labelColor: 'text-orange-500',
-      labelGap: 'mt-0',
       textGlow: 'group-hover:drop-shadow-[0_0_25px_#F97316]',
       hoverTransform: 'group-hover:-translate-y-3', // 4px up for letter learner
       hoverTextColor: 'group-hover:text-orange-300' // Brighter orange
@@ -232,23 +224,54 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
           transform: skewX(-15deg) rotate(-3deg);
         }
       `}</style>
-      <div 
-        className="flex items-center justify-center min-h-screen p-4 md:p-8 relative"
+      <div
+        className="flex items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden"
       >
-        {/* Background Image Container */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ 
+        {/* Lab scene: covers the viewport like background-size: cover, but keeps the
+            image's 1536x1024 coordinate space so items stay on the countertop at any size */}
+        <div
+          className="absolute left-1/2 top-[50vh] -translate-x-1/2 -translate-y-1/2"
+          style={{
+            width: 'max(100vw, 150vh)',
+            height: 'max(100vh, 66.6667vw)',
             backgroundImage: `url(${labBackground})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundSize: '100% 100%',
+            containerType: 'inline-size'
           }}
-        />
-        
-        {/* Content Container - maintains aspect ratio */}
-        <div className="relative w-full h-full min-h-screen">
+        >
+          {activities.map((activity) => (
+            <button
+              key={activity.id}
+              type="button"
+              onClick={() => onSelectActivity(activity.id)}
+              aria-label={activity.title}
+              className="group absolute -translate-x-1/2 block cursor-pointer bg-transparent p-0 border-0"
+              style={{ left: `${activity.scene.x}%`, bottom: `${activity.scene.base}%`, width: `${activity.scene.w}%` }}
+            >
+              <img
+                src={activity.asset}
+                alt=""
+                draggable={false}
+                className={`block w-full h-auto ${activity.hoverTransform} ${activity.glow} transition-all duration-300`}
+              />
+              <span
+                className={`absolute top-full left-1/2 -translate-x-1/2 mt-[0.3cqw] whitespace-nowrap opacity-80 group-hover:opacity-100 ${activity.labelColor} ${activity.hoverTextColor} ${activity.textGlow} text-[1.25cqw] font-black transition-all duration-300`}
+                style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}
+              >
+                {activity.title.split('').map((char, i) => (
+                  <span key={i} className="child-text">
+                    {char === ' ' ? ' ' : char}
+                  </span>
+                ))}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Overlay UI - pointer-events pass through to the scene except on its controls */}
+        <div className="relative w-full h-full min-h-screen pointer-events-none">
           {/* Banner at top */}
-          <div className="absolute top-[2%] left-1/2 transform -translate-x-1/2 z-10 w-[20%]">
+          <div className="absolute top-[2%] left-1/2 transform -translate-x-1/2 z-10 w-[min(20%,32vh)]">
             <img 
               src={banner} 
               alt="Liam's Learning Lab" 
@@ -257,7 +280,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
           </div>
 
           {/* Progress Button - Top Right */}
-          <div className="absolute top-[5%] right-[5%] group cursor-pointer z-20">
+          <div className="absolute top-[5%] right-[5%] group cursor-pointer z-20 pointer-events-auto">
             <Button
               onClick={onProgressDashboard}
               className="w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-xl flex items-center justify-center text-lg font-medium border-2 border-white transition-all duration-300 group-hover:scale-110"
@@ -275,7 +298,7 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
 
           {/* Install App Button - Below Progress */}
           {deferredPrompt && (
-            <div className="absolute top-[13%] right-[5%] group cursor-pointer z-20">
+            <div className="absolute top-[13%] right-[5%] group cursor-pointer z-20 pointer-events-auto">
               <Button
                 onClick={onInstallApp}
                 className="w-14 h-14 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-xl flex items-center justify-center text-lg font-medium border-2 border-white transition-all duration-300 group-hover:drop-shadow-[0_0_15px_#10B981] group-hover:scale-110"
@@ -291,40 +314,6 @@ const RootMenu = ({ onSelectActivity, onProgressDashboard, onInstallApp, deferre
               </div>
             </div>
           )}
-
-          {/* Activity Buttons */}
-          {activities.map((activity) => (
-            <div
-              key={activity.id}
-              className={`${activity.position} group flex flex-col items-center`}
-            >
-              {/* Activity Asset */}
-              <div
-                className={`${activity.size} ${activity.hoverTransform} transition-all duration-300 cursor-pointer`}
-                onClick={() => onSelectActivity(activity.id)}
-              >
-                <img 
-                  src={activity.asset} 
-                  alt={activity.title}
-                  className={`w-full h-full object-contain ${activity.glow} transition-all duration-300`}
-                />
-              </div>
-              
-              {/* Activity Label - positioned below the asset */}
-              <div
-                className={`${activity.labelGap} opacity-80 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer`}
-                onClick={() => onSelectActivity(activity.id)}
-              >
-                <div className={`${activity.labelColor} ${activity.hoverTextColor} ${activity.textGlow} text-[1.2vw] font-black whitespace-nowrap text-center transition-all duration-300`} style={{ fontFamily: 'Impact, "Arial Black", "Trebuchet MS", sans-serif', letterSpacing: '0.5px' }}>
-                  {activity.title.split('').map((char, i) => (
-                    <span key={i} className="child-text">
-                      {char === ' ' ? '\u00A0' : char}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </>
