@@ -114,7 +114,7 @@ const FloatingItem = ({ item, letter, onClick, isSelected, isCorrect, isTarget, 
   );
 };
 
-const MatchingGame = ({ onHome, onLock, isNavigationLocked }) => {
+const MatchingGame = ({ onHome, onLock, isNavigationLocked, onAttempt }) => {
   const [gameItems, setGameItems] = useState([]);
   const [targetItem, setTargetItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -174,6 +174,7 @@ const MatchingGame = ({ onHome, onLock, isNavigationLocked }) => {
     setSelectedItem(item);
     const correct = item.letter === targetItem.letter && item.id === targetItem.id;
     setIsCorrect(correct);
+    onAttempt?.(targetItem.name, correct);
 
     if (correct) {
       setScore(score + 1);

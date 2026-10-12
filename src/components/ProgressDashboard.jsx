@@ -7,7 +7,7 @@ import {
   Calendar as CalendarIcon, Clock, TrendingUp, Award, BookOpen, 
   Target, MessageSquare, Download, LogOut, User,
   CheckCircle, AlertCircle, Activity, Brain, Home, Lock, LockOpen,
-  Settings, Trash2, Plus, Loader2, Mic
+  Settings, Trash2, Plus, Loader2, Mic, ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
@@ -21,29 +21,46 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { useTherapistAuth } from '@/hooks/useTherapistAuth.js';
 import Login from '@/components/Login.jsx';
+import AccessManager from '@/components/AccessManager.jsx';
 import { addDays, format } from "date-fns";
 import { getAllWords, unifiedWordDatabase } from '../lib/unifiedWordDatabase';
 import { generateImage, categorizeWord } from '../services/OpenAI_API.js';
 
-export function ProgressDashboard({ 
-  progressData, 
-    onAddNote, 
+// Server sessions -> the shape the dashboard views expect. Only scored answers count toward accuracy.
+function toProgressData(serverSessions) {
+  if (!serverSessions) return null;
+  const sessions = serverSessions.map((s) => ({
+    ...s,
+    wordDetails: Object.fromEntries(
+      s.words.filter((w) => w.attempts > 0).map((w) => [w.word, { attempts: w.attempts, correct: w.correct }])
+    ),
+  }));
+  return { sessions, wordStats: {}, dailyStats: {} };
+}
+
+export function ProgressDashboard({
+    onAddNote,
   onHome,
   onLock,
-    isNavigationLocked 
+    isNavigationLocked
 }) {
-    const { 
-        isAuthenticated, 
-        therapistInfo, 
-        login, 
-        logout, 
-        extendSession, 
-        getSessionTimeRemaining 
+    const {
+        isAuthenticated,
+        therapistInfo,
+        sessionToken,
+        login,
+        signUp,
+        requestPasswordReset,
+        resetPassword,
+        logout,
+        extendSession,
+        getSessionTimeRemaining
     } = useTherapistAuth();
-    
-    const [loginError, setLoginError] = useState(null);
+
     const [sessionTimeRemaining, setSessionTimeRemaining] = useState(getSessionTimeRemaining());
     const [selectedView, setSelectedView] = useState('overview');
     const [notes, setNotes] = useState([]);
@@ -52,21 +69,27 @@ export function ProgressDashboard({
       to: new Date(),
     });
 
+    const queryRange = useMemo(() => {
+      const from = dateRange?.from ? new Date(dateRange.from) : new Date(0);
+      from.setHours(0, 0, 0, 0);
+      const to = dateRange?.to ? new Date(dateRange.to) : new Date();
+      to.setHours(23, 59, 59, 999);
+      return { from: from.getTime(), to: to.getTime() };
+    }, [dateRange]);
+
+    const serverSessions = useQuery(
+      api.progress.sessions,
+      isAuthenticated && sessionToken ? { token: sessionToken, ...queryRange } : 'skip'
+    );
+    const progressData = useMemo(() => toProgressData(serverSessions), [serverSessions]);
+
     // Filter data based on date range
     const filteredData = useMemo(() => {
       if (!progressData || !progressData.sessions) return null;
-      if (!dateRange || !dateRange.from) return progressData;
 
-      const fromDate = new Date(dateRange.from);
-      fromDate.setHours(0, 0, 0, 0);
-
-      const toDate = dateRange.to ? new Date(dateRange.to) : new Date();
-      toDate.setHours(23, 59, 59, 999);
-
-      const filteredSessions = progressData.sessions.filter(session => {
-          const sessionDate = new Date(session.startTime);
-          return sessionDate >= fromDate && sessionDate <= toDate;
-      });
+      const filteredSessions = progressData.sessions.filter(session =>
+          session.startTime >= queryRange.from && session.startTime <= queryRange.to
+      );
 
       const filteredWordStats = {};
       const filteredDailyStats = {};
@@ -95,7 +118,7 @@ export function ProgressDashboard({
           wordStats: filteredWordStats,
           dailyStats: filteredDailyStats,
       };
-    }, [progressData, dateRange]);
+    }, [progressData, queryRange]);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -106,17 +129,20 @@ export function ProgressDashboard({
         }
     }, [isAuthenticated, getSessionTimeRemaining]);
 
-    const handleLogin = async (email, password) => {
-        try {
-            setLoginError(null);
-            await login(email, password);
-        } catch (error) {
-            setLoginError(error.message);
-        }
-    };
-    
     if (!isAuthenticated || !therapistInfo) {
-        return <Login onLogin={handleLogin} error={loginError} />;
+        return (
+          <Login
+            onLogin={login}
+            onSignUp={signUp}
+            onRequestReset={requestPasswordReset}
+            onResetPassword={resetPassword}
+            footer={
+              <button type="button" onClick={onHome} className="w-full text-sm text-gray-500 hover:text-gray-700">
+                Back to the lab
+              </button>
+            }
+          />
+        );
     }
 
     // We pass the navigation props down to the actual dashboard content
@@ -126,6 +152,8 @@ export function ProgressDashboard({
             filteredData={filteredData}
             onLogout={logout}
             therapistInfo={therapistInfo}
+            sessionToken={sessionToken}
+            isLoadingData={serverSessions === undefined}
             onAddNote={onAddNote}
             onExtendSession={extendSession}
             sessionTimeRemaining={sessionTimeRemaining}
@@ -143,7 +171,9 @@ const DashboardContent = ({
   progressData, 
   filteredData,
   onLogout, 
-  therapistInfo, 
+  therapistInfo,
+  sessionToken,
+  isLoadingData,
   onAddNote,
   onExtendSession,
   sessionTimeRemaining,
@@ -638,7 +668,8 @@ const DashboardContent = ({
               { id: 'words', label: 'Word Analysis', icon: BookOpen },
               { id: 'sessions', label: 'Session Details', icon: CalendarIcon },
               { id: 'notes', label: 'Notes & Observations', icon: MessageSquare },
-              { id: 'settings', label: 'Curriculum Settings', icon: Settings }
+              { id: 'settings', label: 'Curriculum Settings', icon: Settings },
+              ...(therapistInfo.role === 'parent' ? [{ id: 'access', label: 'Access', icon: ShieldCheck }] : [])
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -664,6 +695,11 @@ const DashboardContent = ({
         {/* For brevity, I'll just show the 'overview' section, but all views are included */}
         {selectedView === 'overview' && (
           <div className="space-y-8">
+            {isLoadingData && (
+              <p className="flex items-center text-sm text-gray-500">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading Liam's progress…
+              </p>
+            )}
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -710,6 +746,10 @@ const DashboardContent = ({
           </div>
         )}
         
+        {selectedView === 'access' && therapistInfo.role === 'parent' && (
+          <AccessManager sessionToken={sessionToken} />
+        )}
+
         {/* Curriculum Settings View */}
         {selectedView === 'settings' && (
           <div className="space-y-8">

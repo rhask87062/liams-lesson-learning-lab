@@ -5,7 +5,7 @@ import { Volume2, Lock, LockOpen, Home, Check, X } from 'lucide-react';
 import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
-const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked }) => {
+const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, onAttempt, isNavigationLocked }) => {
   const [userInput, setUserInput] = useState('');
   const [isCorrect, setIsCorrect] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -26,6 +26,7 @@ const TestMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
     const correct = userInput.toLowerCase().trim() === currentWord.word.toLowerCase();
     setIsCorrect(correct);
     setShowFeedback(true);
+    onAttempt?.(correct);
     
     // Always play the word audio to reinforce learning
     await handleSpeak();

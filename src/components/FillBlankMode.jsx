@@ -4,7 +4,7 @@ import { Volume2, Lock, LockOpen, Home } from 'lucide-react';
 import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
-const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked, difficulty = 1 }) => {
+const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, onAttempt, isNavigationLocked, difficulty = 1 }) => {
   const [userInput, setUserInput] = useState('');
   const [isCorrect, setIsCorrect] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -90,6 +90,7 @@ const FillBlankMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect,
     const correct = userLetters === expectedLetters;
     setIsCorrect(correct);
     setShowFeedback(true);
+    onAttempt?.(correct);
     
     // Always play the word audio to reinforce learning
     await handleSpeak();

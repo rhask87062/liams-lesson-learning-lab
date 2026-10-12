@@ -15,7 +15,9 @@ import WordListManager from './components/WordListManager.jsx';
 import KeyboardGuide from './components/KeyboardGuide.jsx';
 import { getAllWords, speakWord as speak, stopSpeaking } from './lib/unifiedWordDatabase';
 import './App.css';
-import { useTherapistAuth } from './hooks/useTherapistAuth.js';
+import DeviceSetup from './components/DeviceSetup.jsx';
+import { useDeviceApproval } from './hooks/useDeviceApproval.js';
+import { useProgressTracking } from './hooks/useProgressTracking.js';
 import { Button } from '@/components/ui/button';
 
 function App() {
@@ -28,7 +30,8 @@ function App() {
   const [isNavigationLocked, setIsNavigationLocked] = useState(false);
   const [showUnlockPrompt, setShowUnlockPrompt] = useState(false);
   const [showPWAInstallPrompt, setShowPWAInstallPrompt] = useState(false);
-  const { createParentAccount } = useTherapistAuth();
+  const device = useDeviceApproval();
+  const progress = useProgressTracking(device.deviceToken);
   const [wordList, setWordList] = useState(() => {
     const saved = localStorage.getItem('customWordList');
     return saved ? JSON.parse(saved) : getAllWords();
@@ -65,9 +68,6 @@ function App() {
     return () => window.removeEventListener('spellingSettingsChanged', handleSettingsChange);
   }, [wordList]);
 
-  // Initialize the auth hook. This makes the `createParentAccount` function
-  // available on the window object in development mode.
-  useTherapistAuth();
 
   useEffect(() => {
     // This helps initialize ResponsiveVoice and deals with browser restrictions on audio.
@@ -307,6 +307,7 @@ function App() {
   };
 
   const handleActivitySelect = (activity) => {
+    progress.startNewSession();
     setCurrentActivity(activity);
     if (activity === 'spelling') {
       setCurrentMode('menu');
@@ -333,6 +334,7 @@ function App() {
   };
 
   const handleModeSelect = (mode) => {
+    progress.startNewSession();
     setCurrentMode(mode);
     setCurrentWordIndex(0);
     if (mode === 'fillblank') {
@@ -427,6 +429,12 @@ function App() {
 
   const renderCurrentScreen = () => {
     console.log('Rendering screen:', currentActivity, currentMode); // Debug log
+    if (currentActivity !== 'progress' && !device.approved) {
+      if (device.loading) {
+        return <div className="flex min-h-screen items-center justify-center text-gray-500">Checking this device…</div>;
+      }
+      return <DeviceSetup onApprove={device.approve} onOpenDashboard={handleProgressDashboard} />;
+    }
     switch (currentActivity) {
       case 'root':
         return (
@@ -445,13 +453,6 @@ function App() {
             onHome={handleHome}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}
-            progressData={{
-                // This is placeholder data. In a real app, you'd fetch this
-                // from a secure source after authentication.
-                sessions: [],
-                wordStats: {},
-                dailyStats: {}
-            }}
             onAddNote={(note) => console.log('Note added:', note)}
           />
         );
@@ -472,7 +473,10 @@ function App() {
             return (
               <LearnMode
                 currentWord={currentWord}
-                onNext={handleNext}
+                onNext={() => {
+                  progress.record('learn', currentWord?.word);
+                  handleNext();
+                }}
                 onBack={handleBack}
                 onHome={handleHome}
                 onLock={handleLock}
@@ -488,6 +492,7 @@ function App() {
                 onHome={handleHome}
                 onLock={handleLock}
                 onCorrect={handleCorrectAnswer}
+                onAttempt={(correct) => progress.record('copy', currentWord?.word, correct)}
                 isNavigationLocked={isNavigationLocked}
               />
             );
@@ -501,6 +506,7 @@ function App() {
                 onHome={handleHome}
                 onLock={handleLock}
                 onCorrect={handleCorrectAnswer}
+                onAttempt={(correct) => progress.record('fillBlanks', currentWord?.word, correct)}
                 isNavigationLocked={isNavigationLocked}
               />
             );
@@ -513,12 +519,14 @@ function App() {
                 onHome={handleHome}
                 onLock={handleLock}
                 onCorrect={handleCorrectAnswer}
+                onAttempt={(correct) => progress.record('test', currentWord?.word, correct)}
                 isNavigationLocked={isNavigationLocked}
               />
             );
           case 'matchingGame':
             return (
               <MatchingGame
+                onAttempt={(name, correct) => progress.record('matching', name, correct)}
                 onHome={handleHome}
                 onLock={handleLock}
                 isNavigationLocked={isNavigationLocked}
@@ -531,6 +539,7 @@ function App() {
         return (
           <LetterLearner
             wordList={wordList}
+            onExplore={(word) => progress.record('letterLearner', word)}
             onHome={handleHome}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}
@@ -547,6 +556,7 @@ function App() {
       case 'matching-game':
         return (
           <MatchingGame
+            onAttempt={(name, correct) => progress.record('matching', name, correct)}
             onHome={handleHome}
             onLock={handleLock}
             isNavigationLocked={isNavigationLocked}

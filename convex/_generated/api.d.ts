@@ -13,7 +13,10 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as auth from "../auth.js";
+import type * as devices from "../devices.js";
 import type * as http from "../http.js";
+import type * as progress from "../progress.js";
 import type * as tts from "../tts.js";
 import type * as users from "../users.js";
 
@@ -26,7 +29,10 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  devices: typeof devices;
   http: typeof http;
+  progress: typeof progress;
   tts: typeof tts;
   users: typeof users;
 }>;

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { speakWord } from '../lib/unifiedWordDatabase';
 import WordImage from '@/components/ui/WordImage.jsx';
 
-const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNavigationLocked }) => {
+const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, onAttempt, isNavigationLocked }) => {
   const [userInput, setUserInput] = useState('');
   const [isCorrect, setIsCorrect] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -25,6 +25,7 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
     const correct = userInput.toLowerCase().trim() === currentWord.word.toLowerCase();
     setIsCorrect(correct);
     setShowFeedback(true);
+    onAttempt?.(correct);
     
     // Always play the word audio to reinforce learning
     await handleSpeak();
@@ -152,7 +153,11 @@ const CopyMode = ({ currentWord, onNext, onBack, onHome, onLock, onCorrect, isNa
             type="text"
             value={userInput}
             onChange={handleInputChange}
-            onKeyDown={handleKeyPress}
+            onKeyDown={(e) => {
+              // The container has the same handler; without this, Enter checks the answer twice.
+              e.stopPropagation();
+              handleKeyPress(e);
+            }}
             className={`text-3xl md:text-4xl font-bold text-center p-4 md:p-6 border-4 rounded-xl w-full max-w-md mx-auto focus:outline-none tablet-input keyboard-focus ${
               showFeedback
                 ? isCorrect

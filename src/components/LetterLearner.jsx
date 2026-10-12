@@ -139,7 +139,7 @@ const Instructions = ({ onDismiss }) => (
   </motion.div>
 );
 
-const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
+const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList, onExplore }) => {
   const [wordsByLetter, setWordsByLetter] = useState({});
   const [popupWord, setPopupWord] = useState(null);
   const [showInstructions, setShowInstructions] = useState(!sessionStorage.getItem('instructionsDismissed'));
@@ -166,6 +166,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
     const words = wordsByLetter[letter];
     if (words && words.length > 0) {
       const wordToShow = words[Math.floor(Math.random() * words.length)];
+      onExplore?.(wordToShow.word);
       setPopupWord(wordToShow);
       setErupt(true);
       setIsAnimating(true);
@@ -184,7 +185,7 @@ const LetterLearner = ({ onHome, onLock, isNavigationLocked, wordList }) => {
         setActiveKey(null); // Remove highlight
       }, 4500);
     }
-  }, [wordsByLetter, isAnimating]);
+  }, [wordsByLetter, isAnimating, onExplore]);
 
   // Keyboard navigation
   useEffect(() => {
